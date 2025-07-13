@@ -1,0 +1,15 @@
+"""
+Sistema de permisos para los roles de usuario.
+"""
+from enum import Enum
+
+class Role(Enum):
+    """
+    Enumeración que define los roles disponibles en el sistema.
+    Los valores son strings legibles que se almacenarán en la DB.
+    """
+    SUPER_ADMIN = 'super_admin'
+    ADMIN = 'admin'
+    ACADEMIC = 'academic'
+    TEACHER = 'teacher'
+    STUDENT = 'student'
