@@ -1,0 +1,8 @@
+/* Archivo CSS para estilos adicionales */
+.select.is-multiple select[multiple] {
+    height: auto;
+    padding: 0.5em;
+    option {
+        padding: 0.5em 1em;
+    }
+}
