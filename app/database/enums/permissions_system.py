@@ -1,7 +1,7 @@
 from typing import Set, Dict
 
-from app.database.models.roles_model import Role
-from app.database.models.permissions_model import Permission
+from app.database.enums.roles_model import Role
+from app.database.enums.permissions_model import Permission
 
 # Mapeo de jerarquía de roles (números más bajos = mayor privilegio)
 ROLE_HIERARCHY: Dict[Role, int] = {

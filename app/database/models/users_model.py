@@ -3,9 +3,9 @@ from datetime import datetime
 from typing import Optional
 
 from app.database.db_config import db
-from app.database.models.permissions_model import Permission
-from app.database.models.roles_model import Role
-from app.database.models.permissions_system import user_has_permission
+from app.database.enums.permissions_model import Permission
+from app.database.enums.roles_model import Role
+from app.database.enums.permissions_system import user_has_permission
 
 class Usuario(db.Model, UserMixin):
     """Modelo para la tabla de usuarios en la db"""
