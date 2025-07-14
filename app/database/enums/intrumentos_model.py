@@ -1,3 +1,4 @@
+from typing import List, Tuple
 from enum import Enum
 
 class Instrumento(Enum):
@@ -20,5 +21,5 @@ class Instrumento(Enum):
         return f"{self.value}"
 
     @classmethod
-    def choices(cls) -> list[tuple[str, str]]:
+    def choices(cls) -> List[Tuple[str, str]]:
         return [(e.value, e.name.replace("_", " ").title()) for e in cls]
