@@ -48,7 +48,7 @@ class Usuario(db.Model, UserMixin):
             'nombres': f"{self.primer_nombre} {self.segundo_nombre}",
             'apellidos': f"{self.primer_apellido} {self.segundo_apellido}",
             'email': self.email,
-            'cedula': self.cedula if self.cedula else "No cedulado)",
+            'cedula': self.cedula if self.cedula else "No cedulado",
             'sexo': self.sexo,
             'fecha_nacimiento': self.fecha_nacimiento,
             "fecha_creacion": self.fecha_creacion,
