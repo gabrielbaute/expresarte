@@ -17,5 +17,9 @@ class Role(Enum):
     def __repr__(self):
         return f"{self.value}"
     
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.value}"
+
+    @classmethod
+    def choices(cls) -> list[tuple[str, str]]:
+        return [(e.value, e.name.replace("_", " ").title()) for e in cls]
