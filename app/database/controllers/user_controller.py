@@ -59,31 +59,29 @@ class UserController(DatabaseController):
                 return None
 
     def get_users_by_role(self, role: Union[str, Role], only_active: bool = True) -> List[Usuario]:
-        """
-        Obtiene todos los usuarios con un rol específico.
-        
-        Args:
-            role: Rol a filtrar (debe ser uno de los Role values)
-            only_active: Si True, solo devuelve usuarios activos
-        
-        Returns:
-            List[Usuario]: Lista de usuarios con el rol especificado
-        
-        Raises:
-            InvalidRoleError: Si el rol no es válido
-        """
+        """Obtiene usuarios por rol, o todos si se usa 'all'."""
         self._check_permission(Permission.VIEW_USERS)
-        self._validate_role(role)
-        
+
         query = Usuario.query
 
-        if role != "all":
-            query = Usuario.query.filter_by(role=role)
+        if isinstance(role, Role):
+            query = query.filter_by(role=role.value)
+        elif isinstance(role, str):
+            if role != "all":
+                try:
+                    role_enum = Role(role)
+                    query = query.filter_by(role=role_enum.value)
+                except ValueError:
+                    valid_roles = [r.value for r in Role]
+                    current_app.logger.error(f"Rol inválido: {role}. Roles válidos: {valid_roles}")
+                    return []
+            # Si es "all", no se filtra el rol
+
         if only_active:
             query = query.filter_by(activo=True)
-            
+
         return query.all()
-    
+
     # Métodos para crear y actualizar usuarios
     def create_user(
         self,
