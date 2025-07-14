@@ -1,0 +1,1 @@
+from app.server.forms.auth_forms import LoginForm
