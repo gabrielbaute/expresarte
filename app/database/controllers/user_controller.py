@@ -1,7 +1,7 @@
 from flask import current_app
 from werkzeug.security import generate_password_hash
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, Union, List
 
 from app.database.db_config import db
 from app.database.models import Usuario
@@ -58,7 +58,7 @@ class UserController(DatabaseController):
                 current_app.logger.error(f"Error al obtener usuario por ID: {e}")
                 return None
 
-    def get_users_by_role(self, role: str, only_active: bool = True) -> List[Usuario]:
+    def get_users_by_role(self, role: Union[str, Role], only_active: bool = True) -> List[Usuario]:
         """
         Obtiene todos los usuarios con un rol específico.
         
@@ -73,9 +73,12 @@ class UserController(DatabaseController):
             InvalidRoleError: Si el rol no es válido
         """
         self._check_permission(Permission.VIEW_USERS)
-        self._validate_role(role)  # Esto lanza InvalidRoleError si el rol no es válido
+        self._validate_role(role)
         
-        query = Usuario.query.filter_by(role=role)
+        query = Usuario.query
+
+        if role != "all":
+            query = Usuario.query.filter_by(role=role)
         if only_active:
             query = query.filter_by(activo=True)
             

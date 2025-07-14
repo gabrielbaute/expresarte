@@ -38,3 +38,15 @@ def crear_usuario():
             flash("Hubo un problema al crear el usuario.", "danger")
 
     return render_template('admin/create_user.html', form=form)
+
+@admin_bp.route('/usuarios')
+@login_required
+def lista_usuarios():
+    if not current_user.is_admin():
+        flash("Acceso denegado: solo administradores pueden ver esta página.", "danger")
+        return redirect(url_for('main.index'))
+
+    user_ctrl = UserController(current_user=current_user)
+    usuarios = user_ctrl.get_users_by_role(role='all', only_active=False)
+
+    return render_template('admin/list_users.html', usuarios=usuarios)
