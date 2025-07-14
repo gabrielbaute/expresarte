@@ -1,8 +1,11 @@
 from flask_login import LoginManager
+from flask_migrate import Migrate
 
 login_manager = LoginManager()
+migrate = Migrate()
 
 def init_login_manager(app):
+    """Función que inicializa la extensión LoginManager."""
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
     login_manager.login_message = 'Por favor, inicie sesión para acceder a esta página.'
@@ -14,3 +17,7 @@ def init_login_manager(app):
         return Usuario.query.get(int(user_id))
 
     return login_manager
+
+def init_migrate(app, db):
+    """Función que inicializa la extensión Migrate."""
+    migrate.init_app(app, db)

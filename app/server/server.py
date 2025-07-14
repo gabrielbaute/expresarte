@@ -1,10 +1,9 @@
 from flask import Flask
-from flask_migrate import Migrate
 from datetime import datetime
 
 from app.config import Config, create_initial_super_admin
 from app.server.routes import register_blueprints
-from app.server.server_extensions import init_login_manager
+from app.server.server_extensions import init_login_manager, init_migrate
 from app.database import db, init_db
 
 def create_app():
@@ -15,7 +14,7 @@ def create_app():
     app.config.from_object(Config)
 
     init_db(app)
-    migrate = Migrate(app, db)
+    init_migrate(app, db)
     init_login_manager(app)
     register_blueprints(app)
 
