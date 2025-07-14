@@ -17,6 +17,7 @@
             <th>Activo</th>
             <th>Creado</th>
             <th>Acciones</th>
+            <th>Estatus</th>
           </tr>
         </thead>
         <tbody>
@@ -36,8 +37,17 @@
             <td>{{ u.fecha_creacion.strftime('%Y-%m-%d') }}</td>
             <td>
               <a href="{{ url_for('admin.editar_usuario', id=u.id) }}" class="button is-small is-info">Editar</a>
-              <form method="POST" action="{{ url_for('admin.desactivar_usuario', id=u.id) }}" style="display:inline;">
-                <button type="submit" class="button is-small is-danger" onclick="return confirm('¿Seguro que deseas desactivar este usuario?');">Desactivar</button>
+            </td>
+            <td>
+              <form method="POST" action="{{ url_for('admin.cambiar_estado_usuario', id=u.id) }}">
+                {{ form.csrf_token }}
+                <div class="field has-text-centered">
+                  <label class="checkbox switch is-rounded is-small">
+                    {{ form.activo(class="switch-input", checked=u.activo) }}
+                    <span class="switch-label">Activo</span>
+                  </label>
+                </div>
+                <button type="submit" class="button is-small is-link">Actualizar</button>
               </form>
             </td>
           </tr>

@@ -15,7 +15,13 @@ class CreateUserForm(FlaskForm):
     password = PasswordField('Contraseña', validators=[DataRequired(), Length(min=6, max=128)])
     sexo = SelectField('Sexo', choices=Sexo.choices(), validators=[DataRequired()])
     role = SelectField('Rol', choices=Role.choices(), validators=[DataRequired()])
-    cedula = StringField('Cédula', validators=[Length(max=20)])  # Si decides hacerlo obligatorio, se le añade DataRequired
+    cedula = StringField('Cédula', validators=[Length(max=20)])
     fecha_nacimiento = DateField('Fecha de Nacimiento', format='%Y-%m-%d', validators=[DataRequired()])
-    # activo = BooleanField('Activo', choices=Estatus.choices(), default=True)
+    activo = BooleanField('Activo', default=True)
     submit = SubmitField('Crear Usuario')
+
+class UserStatusForm(FlaskForm):
+    """Formulario para actualizar el estado de un usuario"""
+
+    activo = BooleanField('Usuario activo')
+    submit = SubmitField('Actualizar estado')

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Editar Usuario{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h1 class="title has-text-centered">Editar usuario: {{ usuario.email }}</h1>
+
+    <div class="columns is-centered">
+      <div class="column is-full-mobile is-two-thirds-tablet is-half-desktop">
+        <form method="POST">
+          {{ form.hidden_tag() }}
+
+          {% for field in form if field.name != 'submit' and field.name != 'password' %}
+            <div class="field">
+              <label class="label">{{ field.label }}</label>
+              <div class="control">
+                {{ field(class="input") }}
+              </div>
+              {% for error in field.errors %}
+                <p class="help is-danger">{{ error }}</p>
+              {% endfor %}
+            </div>
+          {% endfor %}
+
+          <div class="field is-grouped is-grouped-centered">
+            <div class="control">
+              {{ form.submit(class="button is-info", value="Actualizar") }}
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
