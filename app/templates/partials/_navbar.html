@@ -1,0 +1,43 @@
+<nav class="navbar is-light" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a class="navbar-item" href="{{ url_for('main.index') }}">
+      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo">
+    </a>
+
+    <!-- Botón hamburguesa -->
+    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarMenu">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+
+  <div id="navbarMenu" class="navbar-menu">
+    <div class="navbar-start">
+      
+      <!-- Lógica de usuario ya autenticado -->
+      {% if current_user.is_authenticated %}
+        <a class="navbar-item" href="{{ url_for('main.index') }}">Inicio</a>
+        <a class="navbar-item" href="#">Panel</a>
+        {% if current_user.is_admin() %}
+          <a class="navbar-item" href="#">Administración</a>
+        {% endif %}
+      <!-- Usuario no autenticado -->
+      {% else %}
+        <a class="navbar-item" href="{{ url_for('auth.login') }}">Ingresar</a>
+      {% endif %}
+    </div>
+
+    <!-- Cierre de sesión -->
+    {% if current_user.is_authenticated %}
+    <div class="navbar-end">
+      <div class="navbar-item">
+        <span>👋 {{ current_user.primer_nombre }}</span>
+      </div>
+      <div class="navbar-item">
+        <a class="button is-light" href="{{ url_for('auth.logout') }}">Cerrar sesión</a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</nav>

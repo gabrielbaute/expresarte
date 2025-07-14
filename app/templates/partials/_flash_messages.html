@@ -1,0 +1,19 @@
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <!-- Modal flash (solo uno por render) -->
+    <div id="flash-modal" class="modal">
+      <div class="modal-background"></div>
+      <div class="modal-content">
+        <article class="message is-{{ messages[0][0] }}">
+          <div class="message-header">
+            <p>Notificación</p>
+            <button class="delete modal-close-button" aria-label="close"></button>
+          </div>
+          <div class="message-body" id="flash-message-content">
+            {{ messages[0][1] }}
+          </div>
+        </article>
+      </div>
+    </div>
+  {% endif %}
+{% endwith %}
