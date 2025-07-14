@@ -20,4 +20,10 @@ class Role(Enum):
 
     @classmethod
     def choices(cls) -> List[Tuple[str, str]]:
+        """Devuelve una lista de tuplas de los roles y sus valores."""
         return [(e.value, e.name.replace("_", " ").title()) for e in cls]
+
+    @classmethod
+    def to_list(cls) -> List[str]:
+        """Devuelve una lista con los valores de cada rol"""
+        return [role.value for role in cls]

@@ -17,3 +17,8 @@ class Sexo(Enum):
     @classmethod
     def choices(cls) -> List[Tuple[str, str]]:
         return [(e.value, e.name.replace("_", " ").title()) for e in cls]
+
+    @classmethod
+    def to_list(cls) -> List[str]:
+        """Devuelve una lista con los valores de cada sexo"""
+        return [role.value for role in cls]
