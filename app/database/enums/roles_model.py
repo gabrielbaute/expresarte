@@ -13,3 +13,9 @@ class Role(Enum):
     ACADEMIC = 'academic'
     TEACHER = 'teacher'
     STUDENT = 'student'
+
+    def __repr__(self):
+        return f"{self.value}"
+    
+    def __str__(self):
+        return f"{self.value}"
