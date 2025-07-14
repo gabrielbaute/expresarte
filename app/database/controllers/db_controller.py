@@ -7,10 +7,10 @@ class DatabaseController:
 
     @staticmethod
     def _commit_or_rollback():
-        """Helper para manejar commit/rollback."""
         try:
             db.session.commit()
             return True
         except Exception as e:
             db.session.rollback()
+            print(f"[COMMIT ERROR] {e}")
             return str(e)

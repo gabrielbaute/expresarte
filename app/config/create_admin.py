@@ -34,6 +34,7 @@ def create_initial_super_admin() -> Optional[bool]:
             email=admin_email,
             password=admin_password,
             role="super_admin",
+            sexo="N/A",
             activo=True
         )
 
