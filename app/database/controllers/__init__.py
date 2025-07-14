@@ -1,0 +1,2 @@
+from app.database.controllers.profesor_catedra_controller import ProfesorCatedraController
+from app.database.controllers.user_controller import UserController
