@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Iniciar sesión{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h1 class="title has-text-centered">Inicio de sesión</h1>
+    
+    <div class="columns is-centered">
+      <div class="column is-half">
+
+        <form method="POST" novalidate>
+          {{ form.hidden_tag() }}
+
+          <!-- Email -->
+          <div class="field">
+            <label class="label">{{ form.email.label }}</label>
+            <div class="control has-icons-left">
+              {{ form.email(class="input", placeholder="Correo electrónico") }}
+              <span class="icon is-small is-left">
+                <i class="fas fa-envelope"></i>
+              </span>
+            </div>
+            {% for error in form.email.errors %}
+              <p class="help is-danger">{{ error }}</p>
+            {% endfor %}
+          </div>
+
+          <!-- Password -->
+          <div class="field">
+            <label class="label">{{ form.password.label }}</label>
+            <div class="control has-icons-left">
+              {{ form.password(class="input", placeholder="Contraseña") }}
+              <span class="icon is-small is-left">
+                <i class="fas fa-lock"></i>
+              </span>
+            </div>
+            {% for error in form.password.errors %}
+              <p class="help is-danger">{{ error }}</p>
+            {% endfor %}
+          </div>
+
+          <!-- Submit -->
+          <div class="field is-grouped is-grouped-centered">
+            <div class="control">
+              {{ form.submit(class="button is-primary") }}
+            </div>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
