@@ -2,7 +2,8 @@ from flask import Flask
 from flask_migrate import Migrate
 from datetime import datetime
 
-from app.config import Config
+from app.config import Config, create_initial_super_admin
+from app.server.routes import register_blueprints
 from app.database import db, init_db
 
 def create_app():
@@ -15,8 +16,11 @@ def create_app():
     init_db(app)
     migrate = Migrate(app, db)
 
+    register_blueprints(app)
+
     with app.app_context():
         db.create_all()
+        create_initial_super_admin()
 
     @app.context_processor
     def inject_app_name():
