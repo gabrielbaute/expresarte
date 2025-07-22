@@ -3,7 +3,7 @@ from datetime import datetime
 
 from app.config import Config, create_initial_super_admin
 from app.server.routes import register_blueprints
-from app.server.server_extensions import init_login_manager, init_migrate
+from app.server.server_extensions import init_login_manager, init_migrate, init_csrf
 from app.database import db, init_db
 
 def create_app():
@@ -15,6 +15,7 @@ def create_app():
 
     init_db(app)
     init_migrate(app, db)
+    init_csrf(app)
     init_login_manager(app)
     register_blueprints(app)
 

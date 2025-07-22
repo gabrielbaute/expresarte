@@ -1,8 +1,10 @@
+from flask_wtf import CSRFProtect
 from flask_login import LoginManager
 from flask_migrate import Migrate
 
 login_manager = LoginManager()
 migrate = Migrate()
+csrf = CSRFProtect()
 
 def init_login_manager(app):
     """Función que inicializa la extensión LoginManager."""
@@ -23,3 +25,7 @@ def init_login_manager(app):
 def init_migrate(app, db):
     """Función que inicializa la extensión Migrate."""
     migrate.init_app(app, db)
+
+def init_csrf(app):
+    """Función que inicializa la extensión CSRFProtect."""
+    csrf.init_app(app)
