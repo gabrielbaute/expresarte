@@ -5,12 +5,11 @@ class DatabaseController:
     def __init__(self):
         self.session = db.session
 
-    @staticmethod
-    def _commit_or_rollback():
+    def _commit_or_rollback(self):
         try:
-            db.session.commit()
+            self.session.commit()
             return True
         except Exception as e:
-            db.session.rollback()
+            self.session.rollback()
             print(f"[COMMIT ERROR] {e}")
             return str(e)

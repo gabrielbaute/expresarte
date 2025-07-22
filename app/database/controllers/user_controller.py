@@ -3,7 +3,6 @@ from werkzeug.security import generate_password_hash
 from datetime import datetime
 from typing import Optional, Union, List
 
-from app.database.db_config import db
 from app.database.models import Usuario
 from app.database.enums import Role, Permission
 from app.database.controllers.db_controller import DatabaseController
@@ -147,7 +146,7 @@ class UserController(DatabaseController):
             activo=activo
         )
 
-        db.session.add(user)
+        self.session.add(user)
         if self._commit_or_rollback() is True:
             return user
 
