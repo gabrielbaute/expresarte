@@ -13,6 +13,10 @@ class CatedraAcademica(db.Model):
     grupo = db.Column(db.String(10))  # Ejemplo: "A", "B", etc.
     cupos = db.Column(db.Integer, default=20)
 
+    # Relaciones
+    profesor = db.relationship('Usuario', back_populates='catedras_academicas')
+    periodo = db.relationship('PeriodoAcademico', back_populates='catedras')
+
     def __repr__(self) -> str:
         return f'<CatedraAcademica profesor_id={self.profesor_id} catedra={self.catedra}>'
     

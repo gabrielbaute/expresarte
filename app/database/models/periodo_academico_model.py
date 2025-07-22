@@ -12,6 +12,13 @@ class PeriodoAcademico(db.Model):
     fecha_fin = db.Column(db.Date)
     activo = db.Column(db.Boolean, default=True)
 
+    # Relaciones
+    catedras = db.relationship(
+        'CatedraAcademica',
+        back_populates='periodo',
+        lazy='dynamic'
+    )
+
     def __repr__(self) -> str:
         return f'<PeriodoAcademico {self.nombre}>'
     

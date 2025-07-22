@@ -37,6 +37,11 @@ class Usuario(db.Model, UserMixin):
         back_populates='profesor',
         lazy='dynamic'
     )
+    catedras_academicas = db.relationship(
+        'CatedraAcademica',
+        back_populates='profesor',
+        lazy='dynamic'
+    )
     
     # Métodos requeridos por Flask-Login
     def get_id(self):
