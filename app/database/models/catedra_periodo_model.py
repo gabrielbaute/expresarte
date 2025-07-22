@@ -16,12 +16,8 @@ class CatedraAcademica(db.Model):
     # Relaciones
     profesor = db.relationship('Usuario', back_populates='catedras_academicas')
     periodo = db.relationship('PeriodoAcademico', back_populates='catedras')
-    inscripciones = db.relationship(
-        'Inscripcion',
-        back_populates='catedra_academica',
-        lazy='dynamic'
-    )
-
+    inscripciones = db.relationship("Inscripcion", back_populates="catedra_academica", lazy="dynamic")
+    calificaciones = db.relationship('Calificacion', back_populates='catedra_academica', lazy='dynamic')
 
     def __repr__(self) -> str:
         return f'<CatedraAcademica profesor_id={self.profesor_id} catedra={self.catedra}>'

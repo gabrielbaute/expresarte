@@ -32,21 +32,10 @@ class Usuario(db.Model, UserMixin):
     role = db.Column(db.String(20), nullable=False)
     
     # Relaciones
-    catedras = db.relationship(
-        'ProfesorCatedra',
-        back_populates='profesor',
-        lazy='dynamic'
-    )
-    catedras_academicas = db.relationship(
-        'CatedraAcademica',
-        back_populates='profesor',
-        lazy='dynamic'
-    )
-    inscripciones = db.relationship(
-        'Inscripcion',
-        back_populates='student',
-        lazy='dynamic'
-    )
+    catedras = db.relationship('ProfesorCatedra', back_populates='profesor', lazy='dynamic')
+    catedras_academicas = db.relationship('CatedraAcademica', back_populates='profesor', lazy='dynamic')
+    inscripciones = db.relationship('Inscripcion', back_populates='student', lazy='dynamic')
+    calificaciones = db.relationship('Calificacion', back_populates='alumno', lazy='dynamic')
 
     # Métodos requeridos por Flask-Login
     def get_id(self):

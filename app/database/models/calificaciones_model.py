@@ -17,6 +17,10 @@ class Calificacion(db.Model):
     def __repr__(self) -> str:
         return f'<Evaluacion alumno_id={self.alumno_id} catedra_academica_id={self.catedra_academica_id}>'
     
+    # Relaciones
+    alumno = db.relationship('Usuario', back_populates='calificaciones')
+    catedra_academica = db.relationship('CatedraAcademica', back_populates='calificaciones')
+    
     def to_dict(self) -> Dict[str, any]:
         return {
             'id': self.id,
@@ -26,3 +30,7 @@ class Calificacion(db.Model):
             'observaciones': self.observaciones,
             'fecha': self.fecha
         }
+
+    @property
+    def es_aprobado(self) -> bool:
+        return self.nota is not None and self.nota >= 10

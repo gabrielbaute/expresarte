@@ -10,12 +10,14 @@ class Inscripcion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     alumno_id = db.Column(db.Integer, db.ForeignKey("usuarios.id"))
     catedra_academica_id = db.Column(db.Integer, db.ForeignKey("catedra_academica.id"))
+    periodo_id = db.Column(db.Integer, db.ForeignKey("periodo_academico.id"))
     fecha_inscripcion = db.Column(db.DateTime, default=datetime.utcnow)
     estado = db.Column(db.String(20), default="activo")  # "activo", "retirado", "aprobado"
 
     # Relaciones
-    alumno = db.relationship('Usuario', back_populates='inscripciones')
+    student = db.relationship('Usuario', back_populates='inscripciones')
     catedra_academica = db.relationship('CatedraAcademica', back_populates='inscripciones')
+    periodo = db.relationship("PeriodoAcademico", back_populates="inscripciones")
 
     def __repr__(self) -> str:
         return f'<Inscripcion alumno_id={self.alumno_id} catedra_academica_id={self.catedra_academica_id}>'
