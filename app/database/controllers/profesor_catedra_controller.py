@@ -1,3 +1,4 @@
+from flask import current_app
 from typing import List
 
 from app.database.controllers.db_controller import DatabaseController
@@ -57,7 +58,7 @@ class ProfesorCatedraController(DatabaseController):
         if not asignacion:
             return False
 
-        asignacion.catedra = new_catedra
+        asignacion.catedra = new_catedra.value
         return self._commit_or_rollback() is True
 
     def get_catedra_by_profesor(self, profesor: Usuario) -> List[Catedra]:
@@ -66,12 +67,20 @@ class ProfesorCatedraController(DatabaseController):
 
         resultado: List[Catedra] = []
         for registro in registros:
-            try:
-                resultado.append(Catedra(registro.catedra))
-            except ValueError as e:
-                print(f"[WARN] Cátedra inválida en DB: {registro.catedra} → {e}")
+            if registro.catedra not in Catedra.to_list():
+                current_app.logger.warning(f"Cátedra desconocida en DB: {registro.catedra}")
                 continue
+            try:
+                resultado.append(Catedra.from_label(registro.catedra))
+            except ValueError as e:
+                current_app.logger.warning(f"Cátedra desconocida en DB: {registro.catedra}")
         return resultado
+
+    def get_catedra_dicts_by_profesor(self, profesor: Usuario) -> List[dict]:
+        """Devuelve una lista de diccionarios con todos los profesores y cátedras"""
+        catedras = self.get_catedra_by_profesor(profesor)
+        return [c.to_dict() for c in catedras]
+
 
 """
     def get_instruments_by_profesor_string(self, profesor: Usuario) -> List[str]:
