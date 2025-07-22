@@ -1,8 +1,9 @@
 from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import login_required, current_user
 
-from app.server.forms import CreateUserForm, UserStatusForm
-from app.database.controllers import UserController
+from app.server.forms import CreateUserForm, UserStatusForm, AsignarCatedraForm
+from app.database.controllers import UserController, ProfesorCatedraController
+from app.database.enums import Catedra
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -110,3 +111,82 @@ def cambiar_estado_usuario(id):
         flash("Formulario inválido.", "danger")
 
     return redirect(url_for('admin.lista_usuarios'))
+
+@admin_bp.route('/profesores')
+@login_required
+def lista_profesores():
+    if not current_user.is_admin():
+        flash("Acceso denegado.", "danger")
+        return redirect(url_for('main.index'))
+
+    user_ctrl = UserController(current_user=current_user)
+    catedra_ctrl = ProfesorCatedraController()
+
+    profesores = user_ctrl.get_all_teachers(only_active=True)
+    listado = []
+
+    for profe in profesores:
+        listado.append({
+            "obj": profe,
+            "catedras": catedra_ctrl.get_catedra_by_profesor(profe)
+        })
+
+    return render_template('admin/list_profesores.html', profesores=listado)
+
+@admin_bp.route('/profesores/<int:id>/asignar-catedra', methods=['GET', 'POST'])
+@login_required
+def asignar_catedra(id):
+    if not current_user.is_admin():
+        flash("Acceso denegado.", "danger")
+        return redirect(url_for('main.index'))
+
+    user_ctrl = UserController(current_user=current_user)
+    catedra_ctrl = ProfesorCatedraController()
+    profesor = user_ctrl.get_user_by_id(id)
+
+    if not profesor or not profesor.is_teacher():
+        flash("Profesor inválido.", "warning")
+        return redirect(url_for('admin.lista_profesores'))
+
+    form = AsignarCatedraForm()
+    if form.validate_on_submit():
+        catedra = Catedra.from_label(form.catedra.data)
+        resultado = catedra_ctrl.asignar_catedra(profesor, catedra)
+
+        if resultado:
+            flash(f"Cátedra {catedra.value} asignada a {profesor.primer_nombre}.", "success")
+        else:
+            flash("No se pudo asignar la cátedra.", "danger")
+        return redirect(url_for('admin.lista_profesores'))
+
+    return render_template('admin/asignar_catedra.html', form=form, profesor=profesor)
+
+@admin_bp.route('/profesores/<int:profesor_id>/remover-catedra/<nombre_catedra>', methods=['POST'])
+@login_required
+def remover_catedra(profesor_id, nombre_catedra):
+    if not current_user.is_admin():
+        flash("Acceso denegado.", "danger")
+        return redirect(url_for('main.index'))
+
+    user_ctrl = UserController(current_user=current_user)
+    profesor = user_ctrl.get_user_by_id(profesor_id)
+
+    if not profesor or not profesor.is_teacher():
+        flash("Profesor inválido.", "warning")
+        return redirect(url_for('admin.lista_profesores'))
+
+    catedra_ctrl = ProfesorCatedraController()
+
+    try:
+        catedra_enum = Catedra.from_label(nombre_catedra)
+    except ValueError:
+        flash("Cátedra inválida.", "danger")
+        return redirect(url_for('admin.lista_profesores'))
+
+    resultado = catedra_ctrl.remove_catedra(profesor, catedra_enum)
+    if resultado:
+        flash(f"Cátedra '{nombre_catedra}' removida de {profesor.primer_nombre}.", "info")
+    else:
+        flash("No se pudo remover la cátedra.", "warning")
+
+    return redirect(url_for('admin.lista_profesores'))

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h2 class="title is-4 mb-5">Asignar cátedra a {{ profesor.primer_nombre }} {{ profesor.primer_apellido }}</h2>
+
+    <form method="POST" class="box">
+      {{ form.hidden_tag() }}
+
+      <div class="field">
+        {{ form.catedra.label(class="label") }}
+        <div class="control">
+          {{ form.catedra(class="select is-fullwidth") }}
+        </div>
+      </div>
+
+      <div class="field is-grouped mt-4">
+        <div class="control">
+          {{ form.submit(class="button is-success") }}
+        </div>
+        <div class="control">
+          <a href="{{ url_for('admin.lista_profesores') }}" class="button is-light">Volver</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="title is-4">Profesores activos</h2>
+
+<table class="table is-bordered is-hoverable is-fullwidth">
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Email</th>
+      <th>Instrumentos</th>
+      <th>Lenguaje musical</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in profesores %}
+    {% set instrumentos = item.catedras | selectattr("tipo", "equalto", "instrumento") | list %}
+    {% set lenguaje = item.catedras | selectattr("tipo", "equalto", "lenguaje") | list %}
+    <tr>
+      <td>{{ item.obj.primer_nombre }} {{ item.obj.primer_apellido }}</td>
+      <td>{{ item.obj.email }}</td>
+
+      <!-- Instrumentos -->
+      <td>
+        {% if instrumentos %}
+          {% for c in instrumentos %}
+            <span class="tag is-info is-light is-medium is-rounded me-1" style="display: inline-flex; align-items: center;">
+              {{ c.value }}
+              <form action="{{ url_for('admin.remover_catedra', profesor_id=item.obj.id, nombre_catedra=c.value) }}" method="POST" style="display:inline-block; margin-left: 0.5em;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="button is-small is-danger is-light" title="Remover">
+                  <i class="fas fa-times"></i>
+                </button>
+              </form>
+            </span>
+          {% endfor %}
+        {% else %}
+          <span class="has-text-grey">Sin instrumentos</span>
+        {% endif %}
+      </td>
+
+      <!-- Lenguaje musical -->
+      <td>
+        {% if lenguaje %}
+          {% for c in lenguaje %}
+            <span class="tag is-warning is-light is-medium is-rounded me-1" style="display: inline-flex; align-items: center;">
+              {{ c.value }}
+              <form action="{{ url_for('admin.remover_catedra', profesor_id=item.obj.id, nombre_catedra=c.value) }}" method="POST" style="display:inline-block; margin-left: 0.5em;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="button is-small is-danger is-light" title="Remover">
+                  <i class="fas fa-times"></i>
+                </button>
+              </form>
+            </span>
+          {% endfor %}
+        {% else %}
+          <span class="has-text-grey">Sin lenguaje asignado</span>
+        {% endif %}
+      </td>
+
+      <td>
+        <a href="{{ url_for('admin.asignar_catedra', id=item.obj.id) }}" class="button is-small is-primary is-rounded">Asignar</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
