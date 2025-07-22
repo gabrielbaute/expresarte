@@ -46,8 +46,5 @@ def create_initial_super_admin() -> Optional[bool]:
             return True
 
     except Exception as e:
-        print(
-            f"Error al crear el super admin: {str(e)}", 
-            exc_info=True
-        )
+        current_app.logger.error(f"Error al crear el super admin: {str(e)}", exc_info=True)
         return False
