@@ -2,20 +2,20 @@ from typing import List
 
 from app.database.controllers.db_controller import DatabaseController
 from app.database.models import Usuario, ProfesorCatedra
-from app.database.enums import Instrumento
+from app.database.enums import Catedra
 
 
 class ProfesorCatedraController(DatabaseController):
     """Controlador para el modelo ProfesorCatedra"""
     
-    def assign_instrument(self, profesor: Usuario, instrumento: Instrumento) -> bool:
-        """Asigna un instrumento a un profesor"""
+    def asignar_catedra(self, profesor: Usuario, catedra: Catedra) -> bool:
+        """Asigna una cátedra a un profesor"""
         if not profesor.is_teacher():
             return False
 
         exists = ProfesorCatedra.query.filter_by(
             profesor_id=profesor.id,
-            instrumento=instrumento.value
+            catedra=catedra.value
         ).first()
 
         if exists:
@@ -23,17 +23,17 @@ class ProfesorCatedraController(DatabaseController):
 
         asignacion = ProfesorCatedra(
             profesor_id=profesor.id,
-            instrumento=instrumento.value
+            catedra=catedra.value
         )
 
         self.session.add(asignacion)
         return self._commit_or_rollback() is True
 
-    def remove_instrument(self, profesor: Usuario, instrumento: Instrumento) -> bool:
-        """Elimina la asignación de un instrumento a un profesor"""
+    def remove_catedra(self, profesor: Usuario, catedra: Catedra) -> bool:
+        """Elimina la asignación de una cátedra a un profesor"""
         asignacion = ProfesorCatedra.query.filter_by(
             profesor_id=profesor.id,
-            instrumento=instrumento.value
+            catedra=catedra.value
         ).first()
 
         if not asignacion:
@@ -42,37 +42,34 @@ class ProfesorCatedraController(DatabaseController):
         self.session.delete(asignacion)
         return self._commit_or_rollback() is True
 
-    def update_instrument(
+    def update_catedra(
         self,
         profesor: Usuario,
-        old_instrument: Instrumento,
-        new_instrument: Instrumento
+        old_catedra: Catedra,
+        new_catedra: Catedra
     ) -> bool:
-        """Actualiza la asignación de instrumento de un profesor"""
+        """Actualiza la asignación de cátedra de un profesor"""
         asignacion = ProfesorCatedra.query.filter_by(
             profesor_id=profesor.id,
-            instrumento=old_instrument.value
+            catedra=old_catedra.value
         ).first()
 
         if not asignacion:
             return False
 
-        asignacion.instrumento = new_instrument.value
+        asignacion.catedra = new_catedra
         return self._commit_or_rollback() is True
 
-    def get_instruments_by_profesor(self, profesor: Usuario) -> List[Instrumento]:
-        """Obtiene todos los instrumentos asignados a un profesor"""
-        instrumentos = ProfesorCatedra.query.filter_by(
-            profesor_id=profesor.id
-        ).all()
+    def get_catedra_by_profesor(self, profesor: Usuario) -> List[Catedra]:
+        """Obtiene todas las cátedras asignadas a un profesor"""
+        registros = ProfesorCatedra.query.filter_by(profesor_id=profesor.id).all()
 
-        resultado: List[Instrumento] = []
-        for instrumento in instrumentos:
+        resultado: List[Catedra] = []
+        for registro in registros:
             try:
-                resultado.append(Instrumento(instrumento.instrumento))
+                resultado.append(Catedra(registro.catedra))
             except ValueError as e:
-                # Si algún instrumento guardado en DB no es válido para el Enum, lo ignoramos
-                print(f"[WARN] Instrumento inválido en DB: {instrumento.instrumento}")
+                print(f"[WARN] Cátedra inválida en DB: {registro.catedra} → {e}")
                 continue
         return resultado
 

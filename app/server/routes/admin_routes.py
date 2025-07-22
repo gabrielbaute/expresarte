@@ -3,7 +3,6 @@ from flask_login import login_required, current_user
 
 from app.server.forms import CreateUserForm, UserStatusForm
 from app.database.controllers import UserController
-from app.database.models import Usuario
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
