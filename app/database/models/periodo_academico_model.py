@@ -18,6 +18,12 @@ class PeriodoAcademico(db.Model):
         back_populates='periodo',
         lazy='dynamic'
     )
+    inscripciones = db.relationship(
+        'Inscripcion',
+        back_populates='catedra_academica',
+        lazy='dynamic'
+    )
+
 
     def __repr__(self) -> str:
         return f'<PeriodoAcademico {self.nombre}>'

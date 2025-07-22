@@ -31,7 +31,7 @@ class Usuario(db.Model, UserMixin):
     activo = db.Column(db.Boolean, default=True)
     role = db.Column(db.String(20), nullable=False)
     
-    # Relación para profesores
+    # Relaciones
     catedras = db.relationship(
         'ProfesorCatedra',
         back_populates='profesor',
@@ -42,7 +42,12 @@ class Usuario(db.Model, UserMixin):
         back_populates='profesor',
         lazy='dynamic'
     )
-    
+    inscripciones = db.relationship(
+        'Inscripcion',
+        back_populates='student',
+        lazy='dynamic'
+    )
+
     # Métodos requeridos por Flask-Login
     def get_id(self):
         return str(self.id)

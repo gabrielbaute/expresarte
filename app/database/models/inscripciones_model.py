@@ -13,6 +13,10 @@ class Inscripcion(db.Model):
     fecha_inscripcion = db.Column(db.DateTime, default=datetime.utcnow)
     estado = db.Column(db.String(20), default="activo")  # "activo", "retirado", "aprobado"
 
+    # Relaciones
+    alumno = db.relationship('Usuario', back_populates='inscripciones')
+    catedra_academica = db.relationship('CatedraAcademica', back_populates='inscripciones')
+
     def __repr__(self) -> str:
         return f'<Inscripcion alumno_id={self.alumno_id} catedra_academica_id={self.catedra_academica_id}>'
     
@@ -24,3 +28,15 @@ class Inscripcion(db.Model):
             'fecha_inscripcion': self.fecha_inscripcion,
             'estado': self.estado
         }
+
+    @property
+    def esta_activa(self) -> bool:
+        return self.estado == "activo"
+
+    @property
+    def esta_retirada(self) -> bool:
+        return self.estado == "retirado"
+
+    @property
+    def esta_aprobada(self) -> bool:
+        return self.estado == "aprobado"
