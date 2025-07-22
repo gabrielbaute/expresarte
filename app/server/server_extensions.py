@@ -13,8 +13,10 @@ def init_login_manager(app):
 
     @login_manager.user_loader
     def load_user(user_id):
-        from app.database.models import Usuario
-        return Usuario.query.get(int(user_id))
+        from app.database.controllers import UserController
+        controller = UserController()
+        return controller.get_user_by_id(user_id)
+
 
     return login_manager
 
