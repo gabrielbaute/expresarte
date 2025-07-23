@@ -1,2 +1,6 @@
 from app.database.controllers.profesor_catedra_controller import ProfesorCatedraController
+from app.database.controllers.calificacion_controller import CalificacionController
+from app.database.controllers.inscripcion_controller import InscripcionController
+from app.database.controllers.catedra_academica_controller import CatedraAcademicaController
+from app.database.controllers.periodo_academico_controller import PeriodoAcademicoController
 from app.database.controllers.user_controller import UserController

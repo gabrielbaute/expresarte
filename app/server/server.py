@@ -22,6 +22,9 @@ def create_app():
     with app.app_context():
         db.create_all()
         create_initial_super_admin()
+        if app.config.get("DEBUG", False):
+            from app.database import generar_seed_academico
+            generar_seed_academico()
 
     @app.context_processor
     def inject_app_name():
