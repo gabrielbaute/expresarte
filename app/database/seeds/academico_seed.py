@@ -24,9 +24,9 @@ def generar_seed_academico() -> Optional[bool]:
 
     try:
         # 👥 Usuarios
-        admin = user_ctrl.create_user("Super", "Admin", "admin@example.com", "1234", role="super_admin", sexo="N/A")
-        profesor = user_ctrl.create_user("Luis", "González", "luis@example.com", "1234", role="teacher", sexo="M")
-        alumno = user_ctrl.create_user("Ana", "Ramírez", "ana@example.com", "1234", role="student", sexo="F")
+        admin = user_ctrl.create_user("Super", "Admin", "admin@example.com", "123456", role="super_admin", sexo="N/A")
+        profesor = user_ctrl.create_user("Luis", "González", "luis@example.com", "123456", role="teacher", sexo="M")
+        alumno = user_ctrl.create_user("Ana", "Ramírez", "ana@example.com", "123456", role="student", sexo="F")
 
         # 📅 Período Académico
         periodo = periodo_ctrl.crear_periodo("2025-II", date(2025, 7, 1), date(2025, 12, 15))
