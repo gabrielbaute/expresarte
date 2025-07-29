@@ -1,0 +1,6 @@
+from app.schemas.calificaciones import CalificacionCreate, CalificacionUpdate, CalificacionResponse
+from app.schemas.catedra_periodo import CatedraAcademicaCreate, CatedraAcademicaUpdate, CatedraAcademicaResponse
+from app.schemas.inscripciones import InscripcionCreate, InscripcionUpdate, InscripcionResponse
+from app.schemas.periodo_academico import PeriodoAcademicoCreate, PeriodoAcademicoUpdate, PeriodoAcademicoResponse
+from app.schemas.profesor_catedra import ProfesorCatedraCreate, ProfesorCatedraUpdate, ProfesorCatedraResponse
+from app.schemas.users import UserCreate, UserUpdate, UserResponse, UserLogin
