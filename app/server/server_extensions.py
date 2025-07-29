@@ -28,4 +28,5 @@ def init_migrate(app, db):
 
 def init_csrf(app):
     """Función que inicializa la extensión CSRFProtect."""
+    app.config['WTF_CSRF_ENABLED'] = True
     csrf.init_app(app)
