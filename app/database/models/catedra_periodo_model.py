@@ -1,5 +1,6 @@
 from typing import Dict
 from app.database.db_config import db
+from app.database.enums import Catedra
 
 class CatedraAcademica(db.Model):
     """Modelo para las cátedras por período académico"""
@@ -8,7 +9,7 @@ class CatedraAcademica(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     profesor_id = db.Column(db.Integer, db.ForeignKey("usuarios.id"))
-    catedra = db.Column(db.String(50))  # Se puede validar con Enum Catedra
+    catedra = db.Column(db.Enum(Catedra), nullable=False)
     periodo_id = db.Column(db.Integer, db.ForeignKey("periodo_academico.id"))
     grupo = db.Column(db.String(10))  # Ejemplo: "A", "B", etc.
     cupos = db.Column(db.Integer, default=20)

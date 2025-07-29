@@ -1,6 +1,7 @@
 from typing import Dict
 from app.database.db_config import db
 from datetime import datetime
+from app.database.enums import EstadoInscripcion
 
 class Inscripcion(db.Model):
     """Modelo para las inscripciones de los alumnos"""
@@ -12,7 +13,7 @@ class Inscripcion(db.Model):
     catedra_academica_id = db.Column(db.Integer, db.ForeignKey("catedra_academica.id"))
     periodo_id = db.Column(db.Integer, db.ForeignKey("periodo_academico.id"))
     fecha_inscripcion = db.Column(db.DateTime, default=datetime.utcnow)
-    estado = db.Column(db.String(20), default="activo")  # "activo", "retirado", "aprobado"
+    estado = db.Column(db.Enum(EstadoInscripcion), default="activo")
 
     # Relaciones
     student = db.relationship('Usuario', back_populates='inscripciones')

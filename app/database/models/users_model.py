@@ -3,9 +3,7 @@ from datetime import datetime
 from typing import Optional
 
 from app.database.db_config import db
-from app.database.enums.permissions_model import Permission
-from app.database.enums.roles_model import Role
-from app.database.enums.permissions_system import user_has_permission
+from app.database.enums import Permission, Role, user_has_permission
 
 class Usuario(db.Model, UserMixin):
     """Modelo para la tabla de usuarios en la db"""
@@ -29,7 +27,7 @@ class Usuario(db.Model, UserMixin):
     # Información de control de la cuenta
     fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow)
     activo = db.Column(db.Boolean, default=True)
-    role = db.Column(db.String(20), nullable=False)
+    role = db.Column(db.Enum(Role), nullable=False)
     
     # Relaciones
     catedras = db.relationship('ProfesorCatedra', back_populates='profesor', lazy='dynamic')

@@ -1,5 +1,6 @@
 from typing import Dict
 from app.database.db_config import db
+from app.database.enums import Calificacion
 
 
 class Calificacion(db.Model):
@@ -10,7 +11,7 @@ class Calificacion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     alumno_id = db.Column(db.Integer, db.ForeignKey("usuarios.id"))
     catedra_academica_id = db.Column(db.Integer, db.ForeignKey("catedra_academica.id"))
-    nota = db.Column(db.Float)
+    calificacion = db.Column(db.Enum(Calificacion), nullable=True)
     observaciones = db.Column(db.Text)
     fecha = db.Column(db.DateTime)
 
@@ -26,11 +27,7 @@ class Calificacion(db.Model):
             'id': self.id,
             'alumno_id': self.alumno_id,
             'catedra_academica_id': self.catedra_academica_id,
-            'nota': self.nota,
+            'calificacion': self.calificacion.value if self.calificacion else None,
             'observaciones': self.observaciones,
             'fecha': self.fecha
         }
-
-    @property
-    def es_aprobado(self) -> bool:
-        return self.nota is not None and self.nota >= 10
