@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Estudiantes de {{ nombre_catedra }}{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h1 class="title">Estudiantes de {{ nombre_catedra }}</h1>
+
+    {% if estudiantes %}
+      <table class="table is-fullwidth is-hoverable">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Edad</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for estudiante in estudiantes %}
+          <tr>
+            <td>{{ estudiante.primer_nombre }} {{ estudiante.primer_apellido }}</td>
+            <td>{{ estudiante.email }}</td>
+            <td>{{ estudiante.edad }} años</td>
+            <td>
+              <a href="{{ url_for('teacher.asignar_calificaciones', catedra_id=catedra_id) }}" class="button is-small is-link">
+                Ver calificaciones
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="has-text-grey">No hay estudiantes asignados a esta cátedra.</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

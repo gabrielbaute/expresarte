@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h1 class="title">Asignar Calificaciones</h1>
+    <h2 class="subtitle">{{ catedra.catedra }} – {{ catedra.anio }}° año</h2>
+
+    <form method="POST">
+      {{ form.hidden_tag() }}
+      
+      <table class="table is-striped is-fullwidth">
+        <thead>
+          <tr>
+            <th>Estudiante</th>
+            <th>Edad</th>
+            <th>Nota Final</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for estudiante, form in formset %}
+          <tr>
+            <td>{{ estudiante.nombre_completo }}</td>
+            <td>{{ estudiante.edad }} años</td>
+            <td>
+              {{ form.alumno_id }}
+              {{ form.nota_final(class="input is-small", placeholder="Ej: 18") }}
+              {% if form.nota_final.errors %}
+                <p class="help is-danger">{{ form.nota_final.errors[0] }}</p>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="field mt-4">
+        <button class="button is-primary" type="submit">Guardar Calificaciones</button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}
