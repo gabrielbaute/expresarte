@@ -2,7 +2,7 @@ from flask import current_app
 from typing import List
 
 from app.database.controllers.db_controller import DatabaseController
-from app.database.models import Usuario, ProfesorCatedra
+from app.database.models import Usuario, ProfesorCatedra, CatedraAcademica, PeriodoAcademico
 from app.database.enums import Catedra
 
 
@@ -80,6 +80,45 @@ class ProfesorCatedraController(DatabaseController):
         """Devuelve una lista de diccionarios con todos los profesores y cátedras"""
         catedras = self.get_catedra_by_profesor(profesor)
         return [c.to_dict() for c in catedras]
+    
+    def get_students_by_profesor(self, profesor: Usuario) -> List[Usuario]:
+        """Obtiene todos los estudiantes asignados a un profesor"""
+        catedras = self.get_catedra_by_profesor(profesor)
+        estudiantes = []
+        
+        for catedra in catedras:
+            estudiantes.extend(catedra.get_students())
+        
+        return estudiantes
+
+    def get_students_by_catedra(self, profesor: Usuario, catedra: Catedra) -> List[Usuario]:
+        """Devuelve la lista de estudiantes inscritos activamente en la cátedra de un profesor"""
+        # Validar que el profesor tenga asignada esta cátedra
+        catedras_asignadas = self.get_catedra_by_profesor(profesor)
+        if catedra not in catedras_asignadas:
+            current_app.logger.info(f"El profesor no tiene asignada la cátedra: {catedra}")
+            return []
+
+        # Buscar todas las CatedraAcademica registradas en ese período activo
+        periodo = PeriodoAcademico.query.filter_by(activo=True).first()
+        if not periodo:
+            current_app.logger.warning("No hay período académico activo")
+            return []
+
+        registros = CatedraAcademica.query.filter_by(
+            profesor_id=profesor.id,
+            catedra=catedra.value,
+            periodo_id=periodo.id
+        ).all()
+
+        estudiantes: List[Usuario] = []
+
+        for ca in registros:
+            inscripciones = ca.inscripciones.filter_by(estado="activo").all()
+            estudiantes.extend([i.student for i in inscripciones if i.student and i.student.is_student()])
+
+        return estudiantes
+
 
 
 """
