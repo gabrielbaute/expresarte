@@ -59,6 +59,22 @@ class Usuario(db.Model, UserMixin):
     def is_active(self):
         return self.activo
     
+    @property
+    def edad(self):
+        if self.fecha_nacimiento:
+            today = datetime.today()
+            age = today.year - self.fecha_nacimiento.year
+            if today.month < self.fecha_nacimiento.month or (today.month == self.fecha_nacimiento.month and today.day < self.fecha_nacimiento.day):
+                age -= 1
+            return age
+        return None
+
+    @property
+    def nombre_completo(self) -> str:
+        nombres = f"{self.primer_nombre} {self.segundo_nombre}".strip()
+        apellidos = f"{self.primer_apellido} {self.segundo_apellido}".strip()
+        return f"{nombres} {apellidos}"
+
     # Métodos para verificación de roles y permisos
     def get_role(self) -> Optional[Role]:
         """Devuelve el objeto Role correspondiente al rol del usuario"""
