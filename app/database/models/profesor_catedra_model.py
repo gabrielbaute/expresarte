@@ -15,6 +15,10 @@ class ProfesorCatedra(db.Model):
     def __repr__(self):
         return f'<ProfesorCatedra profesor_id={self.profesor_id} catedra={self.catedra}>'
 
+    @property
+    def tipo(self):
+        return self.catedra.tipo
+
     def to_dict(self) -> Dict:
         return {
             'id': self.id,

@@ -9,6 +9,7 @@ class CatedraAcademica(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     profesor_id = db.Column(db.Integer, db.ForeignKey("usuarios.id"))
+    # profesor_catedra_id = db.Column(db.Integer, db.ForeignKey("profesor_catedra.id")) <--- Posible cambio a futuro, punto a discutir sobre la arquitectura de la db
     catedra = db.Column(db.Enum(Catedra), nullable=False)
     periodo_id = db.Column(db.Integer, db.ForeignKey("periodo_academico.id"))
     grupo = db.Column(db.String(10))  # Ejemplo: "A", "B", etc.
