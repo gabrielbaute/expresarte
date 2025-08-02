@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Optional
 
 from app.database.db_config import db
-from app.database.enums import Permission, Role, user_has_permission
+from app.database.enums import Permission, Role, Sexo, user_has_permission
 
 class Usuario(db.Model, UserMixin):
     """Modelo para la tabla de usuarios en la db"""
@@ -20,7 +20,7 @@ class Usuario(db.Model, UserMixin):
     segundo_nombre = db.Column(db.String(50))
     primer_apellido = db.Column(db.String(50), nullable=False)
     segundo_apellido = db.Column(db.String(50))
-    sexo = db.Column(db.String(10), nullable=False)
+    sexo = db.Column(db.Enum(Sexo), nullable=False)
     cedula = db.Column(db.String(20))  # Opcional para menores
     fecha_nacimiento = db.Column(db.Date)
     
