@@ -1,7 +1,7 @@
 from typing import List, Tuple
 from enum import Enum
 
-class Sexo(Enum):
+class Sexo(str, Enum):
     """Enum para las tablas de sexo de los usuarios"""
 
     MASCULINO = "M"

@@ -24,6 +24,10 @@ class Catedra(Enum):
         self._tipo = tipo
 
     def __str__(self) -> str:
+        return self.name
+
+    @property
+    def label(self) -> str:
         return self._label
 
     @property
@@ -32,7 +36,7 @@ class Catedra(Enum):
 
     @property
     def value(self):
-        return self._label
+        return self.name
 
     @classmethod
     def choices(cls) -> List[Tuple[str, str]]:

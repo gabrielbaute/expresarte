@@ -1,7 +1,7 @@
 from typing import List, Tuple
 from enum import Enum
 
-class EstadoInscripcion(Enum):
+class EstadoInscripcion(str, Enum):
     """Enum para los estados de inscripción"""
 
     ACTIVO = "activo"
@@ -13,7 +13,6 @@ class EstadoInscripcion(Enum):
     ESPERANDO_CONFIRMACION = "esperando_confirmacion"
     RECHAZADO = "rechazado"
     ESPERANDO_PAGO = "esperando_pago"
-    
 
     def __repr__(self):
         return f"{self.value}"

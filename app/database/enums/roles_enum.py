@@ -1,7 +1,7 @@
 from typing import List, Tuple
 from enum import Enum
 
-class Role(Enum):
+class Role(str, Enum):
     """
     Enumeración que define los roles disponibles en el sistema.
     Los valores son strings legibles que se almacenarán en la DB.
