@@ -6,16 +6,6 @@ from app.config.settings import Config
 from app.database.enums import Role, Sexo
 from app.schemas import UserCreate
 
-def build_user(email: str, password: str, nombre: str, apellido: str, role: Role, sexo: Sexo) -> UserCreate:
-    return UserCreate(
-        email=email,
-        password_hash=password,
-        primer_nombre=nombre,
-        primer_apellido=apellido,
-        role=role,
-        sexo=sexo
-    )
-
 def create_initial_super_admin() -> Optional[bool]:
     """Crea el usuario super_admin al iniciar la aplicación por primera vez."""
     admin_nombre = Config.ADMIN_NOMBRE
