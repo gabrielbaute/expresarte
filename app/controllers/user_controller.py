@@ -126,3 +126,5 @@ class UserController(DatabaseController):
     def get_all_admins(self, only_active: bool = True) -> List[UserResponse]:
         return self.get_users_by_role(Role.ADMIN.value, only_active)
 
+    def get_user_model_by_email(self, email: str) -> Usuario | None:
+        return self.session.query(Usuario).filter_by(email=email).first()
