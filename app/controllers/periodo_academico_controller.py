@@ -10,6 +10,9 @@ from sqlalchemy.exc import IntegrityError
 
 class PeriodoAcademicoController(DatabaseController):
     """Controlador para gestión de períodos académicos"""
+    def __init__(self, db, current_user=None):
+        super().__init__(db)
+        self.current_user = current_user
 
     def crear_periodo(self, data: PeriodoAcademicoCreate) -> PeriodoAcademicoResponse:
         if data.fecha_inicio >= data.fecha_fin:

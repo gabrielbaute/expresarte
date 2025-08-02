@@ -14,13 +14,16 @@ class UserController(DatabaseController):
         self.current_user = current_user
 
     # Validaciones internas
-    def _validate_role(self, role: str) -> str:
-        if role not in Role.to_list():
-            raise InvalidRoleError(role, Role.to_list())
-        return role
+    def _validate_role(self, role: Union[str, Role]) -> str:
+        role_str = role.value if isinstance(role, Role) else role
+        if role_str not in Role.to_list():
+            raise InvalidRoleError(role_str, Role.to_list())
+        return role_str
 
     def _check_permission(self, permission: Permission) -> None:
         if self.current_user is None:
+            if permission == Permission.VIEW_USERS:
+                return  # permite vista sin autenticación solo para este caso
             raise PermissionDeniedError("No hay usuario autenticado")
 
         if permission not in self.current_user.permissions:
@@ -59,7 +62,6 @@ class UserController(DatabaseController):
 
         self._commit_or_rollback()
         return self._to_response(user, UserResponse)
-
 
     def list_users(self, role: Optional[str] = None) -> List[UserResponse]:
         query = self.session.query(Usuario)

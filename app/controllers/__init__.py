@@ -1,8 +1,1 @@
-from app.controllers.profesor_catedra_controller import ProfesorCatedraController
-from app.controllers.calificacion_controller import CalificacionController
-from app.controllers.inscripcion_controller import InscripcionController
-from app.controllers.catedra_academica_controller import CatedraAcademicaController
-from app.controllers.periodo_academico_controller import PeriodoAcademicoController
-from app.controllers.user_controller import UserController
-
 from app.controllers.factory import ControllerFactory

@@ -12,6 +12,9 @@ from app.errors.exceptions import NotFoundError, PermissionDeniedError
 
 class CatedraAcademicaController(DatabaseController):
     """Controlador para gestión de cátedras académicas por período"""
+    def __init__(self, db, current_user=None):
+        super().__init__(db)
+        self.current_user = current_user
 
     def crear_catedra(self, data: CatedraAcademicaCreate) -> CatedraAcademicaResponse:
         existente = self.session.query(CatedraAcademica).filter_by(

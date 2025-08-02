@@ -13,6 +13,9 @@ from app.errors.exceptions import PermissionDeniedError, NotFoundError
 
 class ProfesorCatedraController(DatabaseController):
     """Controlador para asignación de cátedras a profesores"""
+    def __init__(self, db, current_user=None):
+        super().__init__(db)
+        self.current_user = current_user
 
     def asignar_catedra(self, data: ProfesorCatedraCreate) -> ProfesorCatedraResponse:
         existente = self.session.query(ProfesorCatedra).filter_by(
