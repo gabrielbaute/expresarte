@@ -2,6 +2,9 @@ from flask_wtf import CSRFProtect
 from flask_login import LoginManager
 from flask_migrate import Migrate
 
+from app.database import db
+from app.database.models import Usuario
+
 login_manager = LoginManager()
 migrate = Migrate()
 csrf = CSRFProtect()
@@ -15,10 +18,8 @@ def init_login_manager(app):
 
     @login_manager.user_loader
     def load_user(user_id):
-        from app.database.controllers import UserController
-        controller = UserController()
-        return controller.get_user_by_id(user_id)
-
+        """Función que carga un usuario por su ID."""
+        return db.session.get(Usuario, int(user_id))
 
     return login_manager
 
