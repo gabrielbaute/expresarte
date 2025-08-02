@@ -27,7 +27,7 @@ class CalificacionResponse(BaseModel):
     periodo_id: int
     calificacion: Calificacion
     observaciones: Optional[str] = None
-    fecha_calificacion: datetime
+    fecha: datetime
 
     model_config = {
         "from_attributes": True

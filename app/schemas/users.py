@@ -14,7 +14,7 @@ class UserCreate(BaseModel):
     sexo: Sexo
     cedula: Optional[str] = None
     fecha_nacimiento: Optional[datetime] = None
-    role: Role = Role.STUDENT
+    role: Role
 
 class UserUpdate(BaseModel):
     email: Optional[EmailStr] = None

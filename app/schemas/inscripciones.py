@@ -7,6 +7,7 @@ from app.database.enums import EstadoInscripcion
 class InscripcionCreate(BaseModel):
     estudiante_id: int
     catedra_academica_id: int
+    periodo_id: int
     estado: EstadoInscripcion = EstadoInscripcion.PENDIENTE
     fecha_inscripcion: datetime = datetime.now()
 
