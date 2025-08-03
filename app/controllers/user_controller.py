@@ -26,7 +26,7 @@ class UserController(DatabaseController):
                 return  # permite vista sin autenticación solo para este caso
             raise PermissionDeniedError("No hay usuario autenticado")
 
-        if permission not in self.current_user.permissions:
+        if not self.current_user.has_permission(permission):
             raise PermissionDeniedError(
                 f"El usuario '{self.current_user.email}' no tiene el permiso requerido: '{permission.name}'"
             )
@@ -126,5 +126,5 @@ class UserController(DatabaseController):
     def get_all_admins(self, only_active: bool = True) -> List[UserResponse]:
         return self.get_users_by_role(Role.ADMIN.value, only_active)
 
-    def get_user_model_by_email(self, email: str) -> Usuario | None:
+    def get_user_model_by_email(self, email: str) -> Optional[Usuario]:
         return self.session.query(Usuario).filter_by(email=email).first()
