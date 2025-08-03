@@ -47,7 +47,7 @@ class ProfesorCatedraController(DatabaseController):
         asignacion = self._get_or_fail(ProfesorCatedra, asignacion_id)
         return self._to_response(asignacion, ProfesorCatedraResponse)
 
-    def eliminar_asignacion(self, profesor_id: int, catedra: str) -> bool:
+    def eliminar_asignacion(self, profesor_id: int, catedra: Catedra) -> bool:
         asignacion = self.session.query(ProfesorCatedra).filter_by(
             profesor_id=profesor_id,
             catedra=catedra
