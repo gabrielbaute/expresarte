@@ -8,7 +8,7 @@
 
     <div class="columns is-centered">
       <div class="column is-full-mobile is-two-thirds-tablet is-half-desktop">
-        <form method="POST">
+        <form method="POST" action="{{ url_for('admin.editar_usuario', id=usuario.id) }}">
           {{ form.hidden_tag() }}
 
           {% for field in form if field.name != 'submit' and field.name != 'password' %}
