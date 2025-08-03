@@ -1,10 +1,22 @@
 from flask_wtf import FlaskForm
-from wtforms import FloatField, HiddenField
-from wtforms.validators import InputRequired, NumberRange
+from wtforms import HiddenField, SelectField, TextAreaField, SubmitField
+from wtforms.validators import InputRequired, Optional
+from app.database.enums import Calificacion
 
 class CalificacionForm(FlaskForm):
     alumno_id = HiddenField(validators=[InputRequired()])
-    nota_final = FloatField("Nota Final", validators=[
-        InputRequired(),
-        NumberRange(min=0, max=20, message="La nota debe estar entre 0 y 20")
-    ])
+
+    nota_final = SelectField(
+        "Calificación Final",
+        choices=Calificacion.choices(),
+        validators=[InputRequired()],
+        coerce=str  # Mapeamos el value del enum como string
+    )
+
+    observaciones = TextAreaField(
+        "Observaciones",
+        validators=[Optional()],
+        render_kw={"rows": 4, "placeholder": "Comentarios sobre el desempeño, avances, etc."}
+    )
+
+    submit = SubmitField("Registrar Calificación")
