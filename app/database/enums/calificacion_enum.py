@@ -16,7 +16,12 @@ class Calificacion(Enum):
 
     @classmethod
     def choices(cls) -> List[Tuple[str, str]]:
-        return [(e.value, e.name) for e in cls]
+        traducciones = {
+            "en_proceso": "En proceso",
+            "avanzado": "Avanzado",
+            "consolidado": "Consolidado"
+        }
+        return [(e.value, traducciones[e.value]) for e in cls]
 
     @classmethod
     def to_list(cls) -> List[str]:
