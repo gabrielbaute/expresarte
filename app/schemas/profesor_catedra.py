@@ -24,6 +24,14 @@ class ProfesorCatedraResponse(BaseModel):
     def serialize_tipo(self, v: Catedra, _info):
         return v.tipo # ← retorna el tipo “instrumento” o “lenguaje”
 
+    @property
+    def categoria(self) -> str:
+        return self.catedra.tipo
+
+    @property
+    def value(self) -> str:
+        return self.catedra.label
+
     model_config = {
         "from_attributes": True
     }
