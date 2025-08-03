@@ -25,3 +25,18 @@ class UserStatusForm(FlaskForm):
 
     activo = BooleanField('Usuario activo')
     submit = SubmitField('Actualizar estado')
+
+class ActualizarUserForm(FlaskForm):
+    """Formulario para crear usuarios"""
+
+    primer_nombre = StringField('Primer Nombre', validators=[DataRequired(), Length(max=50)])
+    segundo_nombre = StringField('Segundo Nombre', validators=[DataRequired(), Length(max=50)])
+    primer_apellido = StringField('Primer Apellido', validators=[DataRequired(), Length(max=50)])
+    segundo_apellido = StringField('Segundo Apellido', validators=[DataRequired(), Length(max=50)])
+    email = StringField('Correo Electrónico', validators=[DataRequired(), Email(), Length(max=100)])
+    sexo = SelectField('Sexo', choices=Sexo.choices(), validators=[DataRequired()])
+    role = SelectField('Rol', choices=Role.choices(), validators=[DataRequired()])
+    cedula = StringField('Cédula', validators=[Length(max=20)])
+    fecha_nacimiento = DateField('Fecha de Nacimiento', format='%Y-%m-%d', validators=[DataRequired()])
+    activo = BooleanField('Activo', default=True)
+    submit = SubmitField('Actualizar')
