@@ -1,6 +1,5 @@
 from typing import Optional
 from flask import current_app
-from werkzeug.security import generate_password_hash
 from app.controllers import ControllerFactory
 from app.config.settings import Config
 from app.database.enums import Role, Sexo
@@ -32,13 +31,12 @@ def create_initial_super_admin() -> Optional[bool]:
             primer_nombre=admin_nombre,
             primer_apellido=admin_apellido,
             email=admin_email,
-            password_hash=generate_password_hash(admin_password),
+            password_hash=admin_password,
             role=Role.SUPER_ADMIN,
             sexo=Sexo.NO_APLICA,
             activo=True
         )
         super_admin = controller.create_user(new_admin)
-
         if not super_admin:
             current_app.logger.warning("No se pudo crear el usuario super admin por motivos desconocidos")
             return False

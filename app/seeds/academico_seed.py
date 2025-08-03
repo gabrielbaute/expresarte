@@ -21,7 +21,7 @@ def generar_seed_academico() -> Optional[bool]:
         calif_ctrl = factory.get_calificacion_controller()
         profesor_catedra_ctrl = factory.get_profesor_catedra_controller()
         
-        DEFAULT_PASSWORD = generate_password_hash("123456")
+        DEFAULT_PASSWORD = "123456"
         
         admin2 = UserCreate(
             primer_nombre="Super",
