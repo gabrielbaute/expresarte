@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired, Email, Length
+from wtforms.validators import DataRequired, Email, Length, EqualTo
 
 class LoginForm(FlaskForm):
     """Formulario para inicio de sesión de usuarios"""
@@ -23,3 +23,11 @@ class LoginForm(FlaskForm):
     )
 
     submit = SubmitField('Iniciar sesión')
+
+class PasswordResetForm(FlaskForm):
+    new_password = PasswordField('Nueva contraseña', validators=[DataRequired(), Length(min=6, max=128)])
+    confirm_password = PasswordField('Confirmar contraseña', validators=[
+        DataRequired(),
+        EqualTo('new_password', message='Las contraseñas no coinciden.')
+    ])
+    submit = SubmitField('Cambiar contraseña')
