@@ -3,11 +3,25 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
+
+{% if profesor.es_admin %}
+  <div class="notification is-warning">
+    <strong>Modo desarrollador:</strong> Vista cargada correctamente. Cátedras: {{ catedras | length }}.
+  </div>
+{% endif %}
+
 <section class="section">
   <div class="container">
     <h1 class="title">Panel de Profesor</h1>
-    <p class="subtitle">Bienvenido, {{ profesor.primer_nombre }} {{ profesor.primer_apellido }}</p>
     <p><strong>Fecha:</strong> {{ fecha_actual }}</p>
+    {% set hora = hora_actual.split(':')[0] | int %}
+    {% if hora < 12 %}
+      <p class="subtitle">¡Buenos días, {{ profesor.primer_nombre }}!</p>
+    {% elif hora < 18 %}
+      <p class="subtitle">¡Buenas tardes, {{ profesor.primer_nombre }}!</p>
+    {% else %}
+      <p class="subtitle">¡Buenas noches, {{ profesor.primer_nombre }}!</p>
+    {% endif %}
 
     <hr>
 
@@ -25,7 +39,7 @@
           <tr>
             <td>{{ c.value }}</td>
             <td>
-              <a href="{{ url_for('teacher.ver_estudiantes', nombre=c.value) }}" class="button is-small is-info">
+              <a href="{{ url_for('teacher.ver_estudiantes', nombre=c.catedra.value) }}" class="button is-small is-info">
                 Ver estudiantes
               </a>
             </td>

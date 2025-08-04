@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}{{ periodo.nombre }}{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h1 class="title is-4">Detalle del Período: {{ periodo.nombre }}</h1>
+    <p><strong>Inicio:</strong> {{ periodo.fecha_inicio.strftime('%d/%m/%Y') }}</p>
+    <p><strong>Fin:</strong> {{ periodo.fecha_fin.strftime('%d/%m/%Y') }}</p>
+    <p><strong>Estado:</strong>
+      {% if periodo.activo %}
+        <span class="tag is-success">Activo</span>
+      {% else %}
+        <span class="tag is-light">Inactivo</span>
+      {% endif %}
+    </p>
+
+    <hr>
+
+    <h2 class="title is-5">Cátedras Asignadas</h2>
+    {% if resumen %}
+    <table class="table is-fullwidth is-hoverable">
+      <thead>
+        <tr>
+          <th>Cátedra</th>
+          <th>Grupo</th>
+          <th>Profesor</th>
+          <th>Inscritos</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in resumen %}
+        <tr>
+          <td>{{ item.nombre }}</td>
+          <td>{{ item.grupo }}</td>
+          <td>{{ item.profesor }}</td>
+          <td>{{ item.inscritos }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <p class="has-text-grey">No hay cátedras registradas para este período.</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

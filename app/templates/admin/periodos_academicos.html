@@ -27,7 +27,7 @@
       <tbody>
         {% for periodo in periodos %}
         <tr>
-          <td>{{ periodo.nombre }}</td>
+          <td><a href="{{ url_for('admin.ver_periodo', id=periodo.id) }}">{{ periodo.nombre }}</a></td>
           <td>{{ periodo.fecha_inicio.strftime('%d/%m/%Y') }}</td>
           <td>{{ periodo.fecha_fin.strftime('%d/%m/%Y') }}</td>
           <td>
@@ -41,14 +41,17 @@
             <div class="buttons is-centered">
               <a href="{{ url_for('admin.editar_periodo', id=periodo.id) }}" class="button is-small is-info">Editar</a>
               <form action="{{ url_for('admin.eliminar_periodo', id=periodo.id) }}" method="POST" style="display:inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit" class="button is-small is-danger" onclick="return confirm('¿Seguro que deseas eliminar este período?');">Eliminar</button>
               </form>
               {% if periodo.activo %}
                 <form action="{{ url_for('admin.desactivar_periodo', id=periodo.id) }}" method="POST" style="display:inline;">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                   <button type="submit" class="button is-small is-warning">Desactivar</button>
                 </form>
               {% else %}
                 <form action="{{ url_for('admin.activar_periodo', id=periodo.id) }}" method="POST" style="display:inline;">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                   <button type="submit" class="button is-small is-success">Activar</button>
                 </form>
               {% endif %}

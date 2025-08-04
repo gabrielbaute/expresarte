@@ -4,37 +4,50 @@
 
 {% block content %}
 <section class="section">
-  <div class="container">
-    <h1 class="title">Estudiantes de {{ nombre_catedra }}</h1>
-
-    {% if estudiantes %}
-      <table class="table is-fullwidth is-hoverable">
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Correo</th>
-            <th>Edad</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for estudiante in estudiantes %}
-          <tr>
-            <td>{{ estudiante.primer_nombre }} {{ estudiante.primer_apellido }}</td>
-            <td>{{ estudiante.email }}</td>
-            <td>{{ estudiante.edad }} años</td>
-            <td>
-              <a href="{{ url_for('teacher.asignar_calificaciones', catedra_id=catedra_id) }}" class="button is-small is-link">
-                Ver calificaciones
-              </a>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    {% else %}
-      <p class="has-text-grey">No hay estudiantes asignados a esta cátedra.</p>
-    {% endif %}
-  </div>
+  <h1 class="title">Estudiantes de {{ nombre_catedra }}</h1>
+  <table class="table is-fullwidth is-striped">
+    <thead>
+      <tr>
+        <th>Estudiante</th>
+        <th>Calificación</th>
+        <th>Observaciones</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for estudiante in estudiantes %}
+      <tr>
+        <td>{{ estudiante.nombre }}</td>
+        <td>
+          {% if estudiante.calificacion == "Sin registrar" %}
+            <span class="tag is-light">Sin registrar</span>
+          {% else %}
+            {{ estudiante.calificacion | capitalize }}
+          {% endif %}
+        </td>
+        <td>{{ estudiante.observaciones or "—" }}</td>
+        <td>
+          <form method="POST" action="{{ url_for('teacher.editar_calificacion', alumno_id=estudiante.id, catedra_id=catedra_id, periodo_id=periodo_id) }}">
+            {{ form.hidden_tag() }}
+            <div class="field has-addons">
+              <div class="control">
+                <div class="select is-small">
+                  <select name="nota">
+                    {% for val, name in form.nota.choices %}
+                      <option value="{{ val }}" {% if val == estudiante.calificacion %}selected{% endif %}>{{ name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="control">
+                <button type="submit" class="button is-small is-success">Guardar</button>
+              </div>
+            </div>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </section>
 {% endblock %}
