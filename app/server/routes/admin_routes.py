@@ -1,14 +1,33 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
 
-from app.server.forms import CreateUserForm, UserStatusForm, AsignarCatedraForm, ActualizarUserForm
-from app.schemas import UserCreate, UserUpdate, ProfesorCatedraCreate, ProfesorCatedraUpdate
+from app.server.forms import(
+    CreateUserForm, 
+    UserStatusForm, 
+    AsignarCatedraForm, 
+    ActualizarUserForm, 
+    PeriodoAcademicoForm, 
+    CrearPeriodoAcademicoForm,
+    CatedraPeriodoForm
+)
+from app.schemas import (
+    UserCreate,
+    UserUpdate, 
+    ProfesorCatedraCreate, 
+    ProfesorCatedraUpdate, 
+    PeriodoAcademicoCreate, 
+    PeriodoAcademicoUpdate,
+    CatedraAcademicaCreate
+)
 from app.controllers import ControllerFactory
 from app.database.enums import Catedra, Role
+from app.database.models import PeriodoAcademico
 
 controller = ControllerFactory(current_user=current_user)
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
+
+# Gestión de Períodos Usuarios
 
 @admin_bp.route('/usuarios/crear', methods=['GET', 'POST'])
 @login_required
@@ -56,7 +75,6 @@ def lista_usuarios():
     usuarios = user_ctrl.get_users_by_role(role='all', only_active=False)
 
     return render_template('admin/list_users.html', usuarios=usuarios, form=form)
-
 
 @admin_bp.route('/usuarios/<int:id>/editar', methods=['GET', 'POST'])
 @login_required
@@ -117,6 +135,8 @@ def cambiar_estado_usuario(id):
         flash("Formulario inválido.", "danger")
 
     return redirect(url_for('admin.lista_usuarios'))
+
+# Gestión de Profesores
 
 @admin_bp.route('/profesores')
 @login_required
@@ -196,3 +216,190 @@ def remover_catedra(profesor_id, nombre_catedra):
         flash("No se pudo remover la cátedra.", "warning")
 
     return redirect(url_for('admin.lista_profesores'))
+
+# Gestión de Períodos Académicos
+
+@admin_bp.route('/periodos-academicos', methods=['GET', 'POST'])
+@login_required
+def gestionar_periodos():
+    if not current_user.is_admin():
+        flash("Acceso denegado.", "danger")
+        return redirect(url_for('main.index'))
+
+    periodo_ctrl = ControllerFactory(current_user=current_user).get_periodo_academico_controller()
+
+    form = PeriodoAcademicoForm()
+    if form.validate_on_submit():
+        data = PeriodoAcademicoCreate(
+            nombre=form.nombre.data,
+            fecha_inicio=form.fecha_inicio.data,
+            fecha_fin=form.fecha_fin.data,
+            activo=form.activo.data
+        )
+        try:
+            periodo_ctrl.crear_periodo(data)
+            flash("Período académico creado exitosamente.", "success")
+        except Exception as e:
+            flash(str(e.orig), "danger")
+        return redirect(url_for('admin.gestionar_periodos'))
+
+    periodos = periodo_ctrl.listar_periodos()
+    return render_template(
+        'admin/periodos_academicos.html',
+        form=form,
+        periodos=periodos
+    )
+
+@admin_bp.route('/periodos-academicos/crear', methods=['GET', 'POST'])
+@login_required
+def crear_periodo():
+    if not current_user.is_admin():
+        flash("Acceso denegado.", "danger")
+        return redirect(url_for('main.index'))
+
+    periodo_ctrl = ControllerFactory(current_user=current_user).get_periodo_academico_controller()
+    form = CrearPeriodoAcademicoForm()
+
+    if form.validate_on_submit():
+        data = PeriodoAcademicoCreate(
+            nombre=form.nombre.data,
+            fecha_inicio=form.fecha_inicio.data,
+            fecha_fin=form.fecha_fin.data,
+            activo=form.activo.data
+        )
+        try:
+            periodo_ctrl.crear_periodo(data)
+            flash("Período académico creado exitosamente.", "success")
+            return redirect(url_for('admin.gestionar_periodos'))
+        except Exception as e:
+            flash(str(e), "danger")
+
+    return render_template('admin/crear_periodo.html', form=form)
+
+@admin_bp.route('/periodos-academicos/<int:id>/editar', methods=['GET', 'POST'])
+@login_required
+def editar_periodo(id):
+    if not current_user.is_admin():
+        flash("Acceso denegado.", "danger")
+        return redirect(url_for('main.index'))
+
+    factory = ControllerFactory(current_user=current_user)
+    periodo_ctrl = factory.get_periodo_academico_controller()
+    catedra_ctrl = factory.get_catedra_academica_controller()
+    user_ctrl = factory.get_user_controller()
+
+    periodo = periodo_ctrl._get_or_fail(PeriodoAcademico, id)
+    form = PeriodoAcademicoForm(obj=periodo)
+    catedra_form = CatedraPeriodoForm()
+
+    # Cargar opciones del enum Catedra y lista de profesores
+    catedra_form.catedra.choices = Catedra.choices()
+    profesores = user_ctrl.get_all_teachers()
+    catedra_form.profesor_id.choices = [(0, "— Sin profesor —")] + [(p.id, p.primer_nombre) for p in profesores]
+
+    # Edición del período
+    if form.validate_on_submit() and not catedra_form.submit.data:
+        data = PeriodoAcademicoUpdate(
+            nombre=form.nombre.data,
+            fecha_inicio=form.fecha_inicio.data,
+            fecha_fin=form.fecha_fin.data,
+            activo=form.activo.data
+        )
+        try:
+            periodo_ctrl.update_periodo(periodo_id=id, data=data)
+            flash("Período actualizado correctamente.", "success")
+        except Exception as e:
+            flash(f"Error al actualizar: {str(e)}", "danger")
+        return redirect(url_for('admin.editar_periodo', id=id))
+
+    # Asignación de cátedra académica
+    if catedra_form.validate_on_submit() and catedra_form.submit.data:
+        profesor = catedra_form.profesor_id.data if catedra_form.profesor_id.data != 0 else None
+        nueva_catedra = CatedraAcademicaCreate(
+            periodo_id=id,
+            catedra=catedra_form.catedra.data,
+            grupo=catedra_form.grupo.data,
+            profesor_id=profesor
+        )
+        try:
+            catedra_ctrl.crear_catedra(nueva_catedra)
+            flash("Cátedra asignada correctamente.", "success")
+        except Exception as e:
+            flash(f"Error al asignar cátedra: {str(e)}", "danger")
+        return redirect(url_for('admin.editar_periodo', id=id))
+
+    # Listar cátedras ya asignadas
+    catedras = catedra_ctrl.listar_por_periodo(id)
+
+    return render_template("admin/editar_periodo.html", form=form, catedra_form=catedra_form,
+                           periodo=periodo, catedras=catedras)
+
+@admin_bp.route('/periodos-academicos/<int:id>/eliminar', methods=['POST'])
+@login_required
+def eliminar_periodo(id):
+    if not current_user.is_admin():
+        flash("Acceso denegado.", "danger")
+        return redirect(url_for('main.index'))
+
+    periodo_ctrl = ControllerFactory(current_user=current_user).get_periodo_academico_controller()
+    try:
+        periodo_ctrl.delete_periodo(id)
+        flash("Período académico eliminado.", "success")
+    except Exception as e:
+        flash(f"No se pudo eliminar el período: {str(e)}", "danger")
+
+    return redirect(url_for('admin.gestionar_periodos'))
+
+@admin_bp.route('/periodos-academicos/<int:id>/activar', methods=['POST'])
+@login_required
+def activar_periodo(id):
+    if not current_user.is_admin():
+        flash("Acceso denegado.", "danger")
+        return redirect(url_for('main.index'))
+
+    periodo_ctrl = ControllerFactory(current_user=current_user).get_periodo_academico_controller()
+    periodo_ctrl.activar_periodo(id)
+    flash("Período académico activado.", "success")
+    return redirect(url_for('admin.gestionar_periodos'))
+
+@admin_bp.route('/periodos-academicos/<int:id>/desactivar', methods=['POST'])
+@login_required
+def desactivar_periodo(id):
+    if not current_user.is_admin():
+        flash("Acceso denegado.", "danger")
+        return redirect(url_for('main.index'))
+
+    periodo_ctrl = ControllerFactory(current_user=current_user).get_periodo_academico_controller()
+    periodo_ctrl.desactivar_periodo(id)
+    flash("Período académico desactivado.", "warning")
+    return redirect(url_for('admin.gestionar_periodos'))
+
+@admin_bp.route('/periodos-academicos/<int:id>/ver', methods=['GET'])
+@login_required
+def ver_periodo(id):
+    if not current_user.is_admin():
+        flash("Acceso denegado.", "danger")
+        return redirect(url_for('main.index'))
+
+    factory = ControllerFactory(current_user=current_user)
+    periodo_ctrl = factory.get_periodo_academico_controller()
+    catedra_ctrl = factory.get_catedra_academica_controller()
+    inscripcion_ctrl = factory.get_inscripcion_controller()
+    user_ctrl = factory.get_user_controller()
+
+    periodo = periodo_ctrl._get_or_fail(PeriodoAcademico, id)
+    catedras = catedra_ctrl.listar_por_periodo(periodo.id)
+
+    resumen = []
+    for cat in catedras:
+        profesor = user_ctrl.get_user_by_id(cat.profesor_id) if cat.profesor_id else None
+        inscritos = inscripcion_ctrl.contar_estudiantes_en_catedra(cat.id) or 0  # ← asegúrate que devuelva int
+
+        resumen.append({
+            "nombre": cat.catedra.label,
+            "grupo": cat.grupo,
+            "profesor": f"{profesor.primer_nombre} {profesor.primer_apellido}" if profesor else "Sin asignar",
+            "inscritos": inscritos
+        })
+
+    return render_template("admin/ver_periodo.html", periodo=periodo, resumen=resumen)
