@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import HiddenField, SelectField, TextAreaField, SubmitField
-from wtforms.validators import InputRequired, Optional
+from wtforms.validators import InputRequired, Optional, DataRequired
 from app.database.enums import Calificacion
 
 class CalificacionForm(FlaskForm):
@@ -20,3 +20,11 @@ class CalificacionForm(FlaskForm):
     )
 
     submit = SubmitField("Registrar Calificación")
+
+class SetCalificacionForm(FlaskForm):
+    nota = SelectField(
+        "Nota",
+        choices=Calificacion.choices(),
+        validators=[DataRequired()]
+    )
+    submit = SubmitField("Asignar")
