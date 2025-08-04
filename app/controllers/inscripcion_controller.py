@@ -69,6 +69,10 @@ class InscripcionController(DatabaseController):
 
         return self._bulk_to_response(inscripciones, InscripcionResponse)
 
+    def contar_estudiantes_en_catedra(self, catedra_id: int) -> int:
+        """Cuenta el número de inscripciones activas en una cátedra académica"""
+        return self.session.query(Inscripcion).filter_by(catedra_academica_id=catedra_id).count()
+
     def listar_por_catedra(self, catedra_id: int) -> List[InscripcionResponse]:
         """Devuelve todas las inscripciones activas en una cátedra"""
         inscripciones = self.session.query(Inscripcion).filter_by(
