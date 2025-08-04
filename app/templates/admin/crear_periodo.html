@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}Crear Período Académico{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h1 class="title is-4">Nuevo Período Académico</h1>
+    <form method="POST">
+      {{ form.hidden_tag() }}
+
+      <div class="field">
+        <label class="label">{{ form.nombre.label }}</label>
+        <div class="control">
+          {{ form.nombre(class="input") }}
+        </div>
+        {% for error in form.nombre.errors %}
+          <p class="help is-danger">{{ error }}</p>
+        {% endfor %}
+      </div>
+
+      <div class="columns">
+        <div class="column">
+          <div class="field">
+            <label class="label">{{ form.fecha_inicio.label }}</label>
+            <div class="control">
+              {{ form.fecha_inicio(class="input") }}
+            </div>
+            {% for error in form.fecha_inicio.errors %}
+              <p class="help is-danger">{{ error }}</p>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="column">
+          <div class="field">
+            <label class="label">{{ form.fecha_fin.label }}</label>
+            <div class="control">
+              {{ form.fecha_fin(class="input") }}
+            </div>
+            {% for error in form.fecha_fin.errors %}
+              <p class="help is-danger">{{ error }}</p>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="checkbox">
+          {{ form.activo() }} {{ form.activo.label.text }}
+        </label>
+      </div>
+
+      <div class="field mt-4">
+        <div class="control">
+          {{ form.submit(class="button is-success") }}
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

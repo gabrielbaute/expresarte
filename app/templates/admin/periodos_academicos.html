@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}Períodos Académicos{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h1 class="title is-4">Gestión de Períodos Académicos</h1>
+
+    <!-- Enlace a crear períodos académicos -->
+    <div class="container">
+      <a href="{{ url_for('admin.crear_periodo') }}" class="button is-primary is-light mb-4">
+        <i class="fas fa-plus"></i> Nuevo Período Académico
+      </a>
+    </div>
+
+    <!-- Tabla de períodos académicos -->
+    <table class="table is-fullwidth is-striped is-hoverable">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Inicio</th>
+          <th>Fin</th>
+          <th>Estado</th>
+          <th class="has-text-centered">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for periodo in periodos %}
+        <tr>
+          <td>{{ periodo.nombre }}</td>
+          <td>{{ periodo.fecha_inicio.strftime('%d/%m/%Y') }}</td>
+          <td>{{ periodo.fecha_fin.strftime('%d/%m/%Y') }}</td>
+          <td>
+            {% if periodo.activo %}
+              <span class="tag is-success">Activo</span>
+            {% else %}
+              <span class="tag is-light">Inactivo</span>
+            {% endif %}
+          </td>
+          <td class="has-text-centered">
+            <div class="buttons is-centered">
+              <a href="{{ url_for('admin.editar_periodo', id=periodo.id) }}" class="button is-small is-info">Editar</a>
+              <form action="{{ url_for('admin.eliminar_periodo', id=periodo.id) }}" method="POST" style="display:inline;">
+                <button type="submit" class="button is-small is-danger" onclick="return confirm('¿Seguro que deseas eliminar este período?');">Eliminar</button>
+              </form>
+              {% if periodo.activo %}
+                <form action="{{ url_for('admin.desactivar_periodo', id=periodo.id) }}" method="POST" style="display:inline;">
+                  <button type="submit" class="button is-small is-warning">Desactivar</button>
+                </form>
+              {% else %}
+                <form action="{{ url_for('admin.activar_periodo', id=periodo.id) }}" method="POST" style="display:inline;">
+                  <button type="submit" class="button is-small is-success">Activar</button>
+                </form>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

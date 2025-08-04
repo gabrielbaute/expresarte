@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}Editar Período{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h1 class="title is-4">Editar {{ periodo.nombre }}</h1>
+    <form method="POST">
+      {{ form.hidden_tag() }}
+
+      <div class="field">
+        <label class="label">{{ form.nombre.label }}</label>
+        <div class="control">{{ form.nombre(class="input") }}</div>
+      </div>
+
+      <div class="columns">
+        <div class="column">
+          <label class="label">{{ form.fecha_inicio.label }}</label>
+          <div class="control">{{ form.fecha_inicio(class="input") }}</div>
+        </div>
+        <div class="column">
+          <label class="label">{{ form.fecha_fin.label }}</label>
+          <div class="control">{{ form.fecha_fin(class="input") }}</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="checkbox">{{ form.activo() }} {{ form.activo.label.text }}</label>
+      </div>
+
+      <div class="field">
+        <div class="control">{{ form.submit(class="button is-success") }}</div>
+      </div>
+    </form>
+
+    <hr>
+
+    <!-- Asignar nueva cátedra -->
+    <h2 class="title is-5">Asignar Cátedra</h2>
+    <form method="POST">
+      {{ catedra_form.hidden_tag() }}
+
+      <div class="columns">
+        <div class="column">
+          <div class="field">
+            <label class="label">{{ catedra_form.catedra.label }}</label>
+            <div class="control">{{ catedra_form.catedra(class="select") }}</div>
+          </div>
+        </div>
+        <div class="column">
+          <div class="field">
+            <label class="label">{{ catedra_form.grupo.label }}</label>
+            <div class="control">{{ catedra_form.grupo(class="input") }}</div>
+          </div>
+        </div>
+        <div class="column">
+          <div class="field">
+            <label class="label">{{ catedra_form.profesor_id.label }}</label>
+            <div class="control">{{ catedra_form.profesor_id(class="select") }}</div>
+            <p class="help">Opcional</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="control">{{ catedra_form.submit(class="button is-info") }}</div>
+      </div>
+    </form>
+
+    <!-- Cátedras asignadas -->
+    <h2 class="title is-5 mt-5">Cátedras Asignadas</h2>
+    <table class="table is-fullwidth is-hoverable">
+      <thead>
+        <tr>
+          <th>Cátedra</th>
+          <th>Grupo</th>
+          <th>Profesor</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for catedra in catedras %}
+        <tr>
+          <td>{{ catedra.catedra }}</td>
+          <td>{{ catedra.grupo }}</td>
+          <td>{{ catedra.profesor.nombre if catedra.profesor else "— Sin profesor —" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
