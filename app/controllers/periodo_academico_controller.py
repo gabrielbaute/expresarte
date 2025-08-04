@@ -55,6 +55,11 @@ class PeriodoAcademicoController(DatabaseController):
         periodo = self.session.query(PeriodoAcademico).filter_by(nombre=nombre).first()
         return self._to_response(periodo, PeriodoAcademicoResponse) if periodo else None
 
+    def get_active_periodo(self) -> Optional[PeriodoAcademicoResponse]:
+        """Devuelve el período académico marcado como activo, si existe"""
+        activo = self.session.query(PeriodoAcademico).filter_by(activo=True).first()
+        return self._to_response(activo, PeriodoAcademicoResponse) if activo else None
+
     def delete_periodo(self, periodo_id: int) -> bool:
         periodo = self._get_or_fail(PeriodoAcademico, periodo_id)
         self.session.delete(periodo)

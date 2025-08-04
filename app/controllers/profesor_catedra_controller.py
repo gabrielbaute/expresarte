@@ -1,13 +1,14 @@
-from typing import List
+from typing import List, Optional
 
 from flask import current_app
 from app.controllers.db_controller import DatabaseController
 from app.database.models import ProfesorCatedra, PeriodoAcademico, CatedraAcademica
 from app.database.enums import Catedra
-from app.schemas.profesor_catedra import (
+from app.schemas import (
     ProfesorCatedraCreate,
     ProfesorCatedraUpdate,
-    ProfesorCatedraResponse
+    ProfesorCatedraResponse,
+    CatedraAcademicaResponse
 )
 from app.errors.exceptions import PermissionDeniedError, NotFoundError
 
@@ -41,6 +42,15 @@ class ProfesorCatedraController(DatabaseController):
     def get_catedras_by_profesor(self, profesor_id: int) -> List[ProfesorCatedraResponse]:
         registros = self.session.query(ProfesorCatedra).filter_by(profesor_id=profesor_id).all()
         return self._bulk_to_response(registros, ProfesorCatedraResponse)
+
+    def get_catedra_academica(self, profesor_id: int, catedra: Catedra, periodo_id: int) -> Optional[CatedraAcademicaResponse]:
+        registro = self.session.query(CatedraAcademica).filter_by(
+            profesor_id=profesor_id,
+            catedra=catedra,
+            periodo_id=periodo_id
+        ).first()
+
+        return self._to_response(registro, CatedraAcademicaResponse) if registro else None
 
 
     def obtener_por_id(self, asignacion_id: int) -> ProfesorCatedraResponse:
