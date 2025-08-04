@@ -1,1 +1,1 @@
-from app.server.server import create_app
+from app.server.server_factory import create_app
