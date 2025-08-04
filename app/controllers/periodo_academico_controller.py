@@ -39,6 +39,7 @@ class PeriodoAcademicoController(DatabaseController):
         return self._bulk_to_response(periodos, PeriodoAcademicoResponse)
 
     def activar_periodo(self, periodo_id: int) -> PeriodoAcademicoResponse:
+        self.session.query(PeriodoAcademico).update({PeriodoAcademico.activo: False}) # <--- Experimental, para evitar que haya más de un período activo a la vez
         periodo = self._get_or_fail(PeriodoAcademico, periodo_id)
         periodo.activo = True
         self._commit_or_rollback()

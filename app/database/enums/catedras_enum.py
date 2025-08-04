@@ -1,5 +1,3 @@
-# app/database/enums/catedras_model.py
-
 from enum import Enum
 from typing import List, Tuple
 

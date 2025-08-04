@@ -79,3 +79,7 @@ class ProfesorCatedraController(DatabaseController):
             ])
 
         return estudiantes
+
+    def get_all_catedras(self) -> List[ProfesorCatedraResponse]:
+        registros = self.session.query(ProfesorCatedra).all()
+        return self._bulk_to_response(registros, ProfesorCatedraResponse)
