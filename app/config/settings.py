@@ -19,6 +19,7 @@ class Config:
     BASEDIR = BASE_DIR
     APP_NAME = os.getenv('APP_NAME', 'Expresarte')
     APP_VERSION = "0.1.0"
+    APP_URL = os.getenv('APP_URL', 'http://localhost:5001')
     PORT = os.environ.get("PORT")
     DEBUG = os.environ.get("DEBUG")
     LANGUAGE = os.environ.get("LANGUAGE")
@@ -38,6 +39,9 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'una_clave_secreta_segura'
     SECURITY_PASSWORD_SALT = os.getenv('SECURITY_PASSWORD_SALT')
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+    RESET_TOKEN_EXP_MINUTES = int(os.getenv('RESET_TOKEN_EXP_MINUTES', 25))
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=int(os.getenv('JWT_ACCESS_TOKEN_EXPIRES', 30)))
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=int(os.getenv('JWT_REFRESH_TOKEN_EXPIRES', 30)))
 
     # Configuración de Flask-Mail
     MAIL_SERVER = os.environ.get('MAIL_SERVER')
