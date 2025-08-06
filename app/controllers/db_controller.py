@@ -45,6 +45,7 @@ class DatabaseController:
         return [self._to_response(i, schema) for i in instances if i]
 
     def _get_or_fail(self, model_class, object_id: int):
+        """Obtiene un objeto por su ID o lanza NotFoundError si no existe."""
         obj = self.session.get(model_class, object_id)
         if obj is None:
             raise NotFoundError(f"{model_class.__name__} con ID {object_id} no encontrado.")

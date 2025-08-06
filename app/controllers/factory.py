@@ -17,19 +17,25 @@ class ControllerFactory:
         self.current_user = current_user
 
     def get_user_controller(self):
+        """Crea una instancia de UserController con el usuario actual."""
         return UserController(self.db, current_user=self.current_user)
 
     def get_catedra_academica_controller(self):
+        """Crea una instancia de CatedraAcademicaController con el usuario actual."""
         return CatedraAcademicaController(self.db, current_user=self.current_user)
 
     def get_periodo_academico_controller(self):
+        """Crea una instancia de PeriodoAcademicoController con el usuario actual."""
         return PeriodoAcademicoController(self.db, current_user=self.current_user)
 
     def get_profesor_catedra_controller(self):
+        """Crea una instancia de ProfesorCatedraController con el usuario actual."""
         return ProfesorCatedraController(self.db, current_user=self.current_user)
 
     def get_calificacion_controller(self):
+        """Crea una instancia de CalificacionController con el usuario actual."""
         return CalificacionController(self.db, current_user=self.current_user)
 
     def get_inscripcion_controller(self):
+        """Crea una instancia de InscripcionController con el usuario actual."""
         return InscripcionController(self.db, current_user=self.current_user)

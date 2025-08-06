@@ -15,12 +15,27 @@ class UserController(DatabaseController):
 
     # Validaciones internas
     def _validate_role(self, role: Union[str, Role]) -> str:
+        """Validates the user role.
+        
+        Keyword arguments:
+        argument: role -- Role to validate, can be a string or Role enum
+        Return: str -- Validated role as a string
+        Raises:
+        InvalidRoleError -- If the role is not valid
+        """
         role_str = role.value if isinstance(role, Role) else role
         if role_str not in Role.to_list():
             raise InvalidRoleError(role_str, Role.to_list())
         return role_str
 
     def _check_permission(self, permission: Permission) -> None:
+        """Checks if the current user has the required permission.
+        
+        Keyword arguments:
+        argument: permission -- Permission to check
+        Raises:
+        PermissionDeniedError -- If the user does not have the required permission
+        """
         if self.current_user is None:
             if permission == Permission.VIEW_USERS:
                 return  # permite vista sin autenticación solo para este caso
@@ -33,6 +48,14 @@ class UserController(DatabaseController):
 
     # Métodos CRUD para usuarios
     def create_user(self, data: UserCreate) -> UserResponse:
+        """"
+        Creates a new user in the database.
+        Keyword arguments:
+        argument: data -- UserCreate schema with user details
+        Return: UserResponse -- UserResponse schema with the created user details
+        Raises:
+        PermissionDeniedError -- If there is already a user with the same email
+        """
         if self.session.query(Usuario).filter_by(email=data.email).first():
             raise PermissionDeniedError("Ya existe un usuario con ese correo.")
 
