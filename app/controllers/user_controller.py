@@ -79,6 +79,7 @@ class UserController(DatabaseController):
         return self._to_response(user, UserResponse)
 
     def edit_user(self, user_id: int, data: UserUpdate) -> UserResponse:
+        """Edita los detalles de un usuario por su ID."""
         user = self._get_or_fail(Usuario, user_id)
         for field, value in data.model_dump(exclude_unset=True).items():
             setattr(user, field, value)
@@ -87,12 +88,15 @@ class UserController(DatabaseController):
         return self._to_response(user, UserResponse)
 
     def list_users(self, role: Optional[str] = None) -> List[UserResponse]:
+        """Lista todos los usuarios."""
+        self._check_permission(Permission.VIEW_USERS)
         query = self.session.query(Usuario)
         if role:
             query = query.filter_by(role=role)
         return self._bulk_to_response(query.all(), UserResponse)
 
     def disable_user(self, user_id: int) -> UserResponse:
+        """Desactiva un usuario por su ID."""
         user = self._get_or_fail(Usuario, user_id)
         user.activo = False
         self._commit_or_rollback()
@@ -117,11 +121,13 @@ class UserController(DatabaseController):
         return self._to_response(user, UserResponse)
 
     def get_user_by_id(self, user_id: int) -> UserResponse:
+        """Obtiene un usuario por su ID."""
         self._check_permission(Permission.VIEW_USERS)
         user = self.session.get(Usuario, user_id)
         return self._to_response(user, UserResponse)
 
     def get_users_by_role(self, role: Union[str, Role], only_active: bool = True) -> List[UserResponse]:
+        """Obtiene todos los usuarios por rol."""
         self._check_permission(Permission.VIEW_USERS)
 
         query = self.session.query(Usuario)
@@ -141,13 +147,24 @@ class UserController(DatabaseController):
         return self._bulk_to_response(query.all(), UserResponse)
 
     def get_all_teachers(self, only_active: bool = True) -> List[UserResponse]:
+        """Obtiene todos los profesores."""
         return self.get_users_by_role(Role.TEACHER.value, only_active)
 
     def get_all_students(self, only_active: bool = True) -> List[UserResponse]:
+        """Obtiene todos los estudiantes."""
         return self.get_users_by_role(Role.STUDENT.value, only_active)
 
     def get_all_admins(self, only_active: bool = True) -> List[UserResponse]:
+        """Obtiene todos los administradores."""
         return self.get_users_by_role(Role.ADMIN.value, only_active)
 
     def get_user_model_by_email(self, email: str) -> Optional[Usuario]:
+        """Obtiene un modelo de usuario por su correo electrónico."""
         return self.session.query(Usuario).filter_by(email=email).first()
+
+    def update_user_password(self, user_id: int, new_password: str) -> bool:
+        """Actualiza la contraseña de un usuario."""
+        user = self._get_or_fail(Usuario, user_id)
+        user.password_hash = generate_password_hash(new_password)
+        self._commit_or_rollback()
+        return True
