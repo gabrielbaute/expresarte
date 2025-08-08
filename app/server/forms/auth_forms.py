@@ -25,9 +25,17 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Iniciar sesión')
 
 class PasswordResetForm(FlaskForm):
+    """Formulario para restablecer la contraseña de un usuario"""
+    
     new_password = PasswordField('Nueva contraseña', validators=[DataRequired(), Length(min=6, max=128)])
     confirm_password = PasswordField('Confirmar contraseña', validators=[
         DataRequired(),
         EqualTo('new_password', message='Las contraseñas no coinciden.')
     ])
     submit = SubmitField('Cambiar contraseña')
+
+class RequestResetPasswordForm(FlaskForm):
+    """Formulario para solicitar el restablecimiento de contraseña"""
+    
+    email = StringField('Correo electrónico', validators=[DataRequired(), Email()])
+    submit = SubmitField('Enviar correo de recuperación')
