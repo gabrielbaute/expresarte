@@ -14,6 +14,11 @@ def str_to_bool(value):
 
 class Config:
     """Configuración de la aplicación Flask."""
+
+    # Environment
+    ENV = os.getenv('FLASK_ENV', 'development')
+    TESTING = str_to_bool(os.environ.get("TESTING", "False"))
+    DEBUG = os.environ.get("DEBUG")
     
     # Flask server
     BASEDIR = BASE_DIR
@@ -21,7 +26,7 @@ class Config:
     APP_VERSION = "0.1.0"
     APP_URL = os.getenv('APP_URL', 'http://localhost:5001')
     PORT = os.environ.get("PORT")
-    DEBUG = os.environ.get("DEBUG")
+    
     LANGUAGE = os.environ.get("LANGUAGE")
     SCHEDULER_API_ENABLED = os.environ.get("SCHEDULER_API_ENABLED") or True
 
