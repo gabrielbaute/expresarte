@@ -5,6 +5,8 @@ from wtforms.validators import DataRequired
 from app.database.enums import Catedra
 
 class AsignarCatedraForm(FlaskForm):
+    """Formulario para asignar una cátedra a un profesor"""
+
     catedra = SelectField(
         'Cátedra a asignar',
         choices=Catedra.choices(),
