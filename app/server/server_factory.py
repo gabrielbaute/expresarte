@@ -6,7 +6,12 @@ from app.server.routes import register_blueprints
 from app.server.server_extensions import init_login_manager, init_migrate, init_csrf
 from app.database import db, init_db
 
-def create_app():
+def create_app() -> Flask:
+    """Función que crea la aplicación Flask.
+    
+    Returns:
+        Flask: Instancia de la aplicación Flask.
+    """
     app = Flask(__name__,
                 template_folder='../templates',
                 static_folder='../static')
@@ -27,7 +32,12 @@ def create_app():
             generar_seed_academico()
 
     @app.context_processor
-    def inject_app_name():
+    def inject_app_name() -> dict:
+        """Función que inyecto el nombre de la aplicación y otras variables en el contexto de la plantilla.
+        
+        Returns:
+            dict: Diccionario con el nombre de la aplicación y otras variables.
+        """
         return {
             "app_name": app.config["APP_NAME"],
             "app_version": app.config["APP_VERSION"],
