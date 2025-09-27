@@ -10,7 +10,11 @@ class MailTokenHandler:
         self.user_id = user_id
 
     def create_reset_token(self) -> str:
-        """Genera un token JWT para recuperación de contraseña"""
+        """Genera un token JWT para recuperación de contraseña
+        
+        Returns:
+            str: Token JWT
+        """
         expiration = timedelta(minutes=Config.RESET_TOKEN_EXP_MINUTES)
         payload = {
             'user_id': self.user_id,
@@ -22,7 +26,14 @@ class MailTokenHandler:
 
     @staticmethod
     def decode_token(token: str) -> Union[int, None]:
-        """Decodifica el token y retorna el user_id si es válido"""
+        """Decodifica el token y retorna el user_id si es válido
+        
+        Args:
+            token (str): Token JWT
+        
+        Returns:
+            Union[int, None]: user_id si es válido, None en caso contrario
+        """
         try:
             payload = jwt.decode(token, Config.SECRET_KEY, algorithms=['HS256'])
             current_app.logger.debug(f"Token decodificado: {payload}")
