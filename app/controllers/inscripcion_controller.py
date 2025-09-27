@@ -1,15 +1,17 @@
+import logging
 from typing import List
+
 from app.controllers.db_controller import DatabaseController
 from app.database.models import Inscripcion, CatedraAcademica
 from app.schemas.inscripciones import InscripcionCreate, InscripcionUpdate, InscripcionResponse
 from app.errors.exceptions import NotFoundError, PermissionDeniedError
-
 
 class InscripcionController(DatabaseController):
     """Controlador para gestionar inscripciones de alumnos a cátedras académicas"""
     def __init__(self, db, current_user=None):
         super().__init__(db)
         self.current_user = current_user
+        self.logger = logging.getLogger(f"[{self.__class__.__name__}]")
 
     def inscribir_alumno(self, data: InscripcionCreate) -> InscripcionResponse:
         """Inscribe a un alumno en una cátedra si cumple condiciones de rol y cupos
@@ -27,6 +29,7 @@ class InscripcionController(DatabaseController):
         # Validar existencia de la cátedra
         catedra = self.session.get(CatedraAcademica, data.catedra_academica_id)
         if not catedra:
+            self.logger.warning(f"Cátedra académica no encontrada: {data.catedra_academica_id}")
             raise NotFoundError("Cátedra académica no encontrada")
 
         # Validar cupos
@@ -35,6 +38,7 @@ class InscripcionController(DatabaseController):
         ).count()
 
         if cupo_actual >= catedra.cupos:
+            self.logger.warning(f"No hay cupos disponibles en la cátedra {catedra.id}")
             raise PermissionDeniedError(f"No hay cupos disponibles en la cátedra {catedra.id}")
 
         # Verificar si ya existe
@@ -43,6 +47,7 @@ class InscripcionController(DatabaseController):
         ).first()
 
         if existente:
+            self.logger.warning(f"El alumno ya está inscrito en esta cátedra: {catedra.id}")
             raise PermissionDeniedError("El alumno ya está inscrito en esta cátedra")
 
         nueva = Inscripcion(
@@ -54,6 +59,7 @@ class InscripcionController(DatabaseController):
 
         self.session.add(nueva)
         self._commit_or_rollback()
+        self.logger.info(f"Inscripción realizada: {nueva}")
         return self._to_response(nueva, InscripcionResponse)
 
 
@@ -72,9 +78,11 @@ class InscripcionController(DatabaseController):
         """
         insc = self._get_or_fail(Inscripcion, inscripcion_id)
         if nuevo_estado not in ["activo", "retirado", "aprobado"]:
+            self.logger.warning(f"Estado inválido: {nuevo_estado}")
             raise ValueError("Estado inválido")
         insc.estado = nuevo_estado
         self._commit_or_rollback()
+        self.logger.info(f"Estado de la inscripción actualizado: {insc}")
         return self._to_response(insc, InscripcionResponse)
 
     def eliminar_inscripcion(self, inscripcion_id: int) -> bool:
@@ -88,6 +96,7 @@ class InscripcionController(DatabaseController):
         """
         insc = self._get_or_fail(Inscripcion, inscripcion_id)
         self.session.delete(insc)
+        self.logger.info(f"Inscripción eliminada: {insc}")
         return self._commit_or_rollback() is True
 
     def listar_por_alumno(self, estudiante_id: int) -> List[InscripcionResponse]:
@@ -141,4 +150,5 @@ class InscripcionController(DatabaseController):
             InscripcionResponse: La inscripción solicitada.
         """
         insc = self._get_or_fail(Inscripcion, inscripcion_id)
+        self.logger.info(f"Inscripción encontrada: {insc}")
         return self._to_response(insc, InscripcionResponse)

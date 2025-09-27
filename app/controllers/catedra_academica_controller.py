@@ -1,3 +1,4 @@
+import logging
 from typing import Optional, List
 
 from app.controllers.db_controller import DatabaseController
@@ -15,6 +16,7 @@ class CatedraAcademicaController(DatabaseController):
     def __init__(self, db, current_user=None):
         super().__init__(db)
         self.current_user = current_user
+        self.logger = logging.getLogger(f"[{self.__class__.__name__}]")
 
     def crear_catedra(self, data: CatedraAcademicaCreate) -> CatedraAcademicaResponse:
         """Crea una nueva cátedra académica.
@@ -35,6 +37,7 @@ class CatedraAcademicaController(DatabaseController):
         ).first()
 
         if existente:
+            self.logger.warning(f"Ya existe una cátedra {data.catedra} en el grupo {data.grupo} del período ID {data.periodo_id}")
             raise PermissionDeniedError(
                 f"La cátedra {data.catedra} ya existe en el grupo {data.grupo} del período ID {data.periodo_id}"
             )
@@ -42,6 +45,7 @@ class CatedraAcademicaController(DatabaseController):
         nueva = CatedraAcademica(**data.model_dump())
         self.session.add(nueva)
         self._commit_or_rollback()
+        self.logger.info(f"Cátedra académica creada: {nueva}")
         return self._to_response(nueva, CatedraAcademicaResponse)
 
     def asignar_profesor(self, catedra_id: int, profesor_id: int) -> CatedraAcademicaResponse:
@@ -60,10 +64,21 @@ class CatedraAcademicaController(DatabaseController):
         catedra = self._get_or_fail(CatedraAcademica, catedra_id)
         catedra.profesor_id = profesor_id
         self._commit_or_rollback()
+        self.logger.info(f"Profesor asignado a la cátedra {catedra_id}: {profesor_id}")
         return self._to_response(catedra, CatedraAcademicaResponse)
 
     def listar_por_periodo(self, periodo_id: int) -> List[CatedraAcademicaResponse]:
-        """Lista todas las cátedras académicas de un período específico."""
+        """Lista todas las cátedras académicas de un período específico.
+        
+        Args:
+            periodo_id (int): ID del período.
+        
+        Return:
+            List[CatedraAcademicaResponse]: Lista de cátedras académicas del período.
+        
+        Raises:
+            NotFoundError: Si el período no existe.
+        """
         catedras = self.session.query(CatedraAcademica).filter_by(periodo_id=periodo_id).order_by(
             CatedraAcademica.grupo
         ).all()
@@ -94,6 +109,7 @@ class CatedraAcademicaController(DatabaseController):
         """
         catedra = self._get_or_fail(CatedraAcademica, catedra_id)
         self.session.delete(catedra)
+        self.logger.info(f"Cátedra académica eliminada: {catedra}")
         return self._commit_or_rollback() is True
 
     def obtener_por_id(self, catedra_id: int) -> CatedraAcademicaResponse:
@@ -106,6 +122,7 @@ class CatedraAcademicaController(DatabaseController):
             CatedraAcademicaResponse: La cátedra académica encontrada.
         """
         catedra = self._get_or_fail(CatedraAcademica, catedra_id)
+        self.logger.info(f"Cátedra académica encontrada: {catedra}")
         return self._to_response(catedra, CatedraAcademicaResponse)
 
     def actualizar_catedra(self, catedra_id: int, data: CatedraAcademicaUpdate) -> CatedraAcademicaResponse:
@@ -122,4 +139,5 @@ class CatedraAcademicaController(DatabaseController):
         for field, value in data.model_dump(exclude_unset=True).items():
             setattr(catedra, field, value)
         self._commit_or_rollback()
+        self.logger.info(f"Cátedra académica actualizada: {catedra}")
         return self._to_response(catedra, CatedraAcademicaResponse)

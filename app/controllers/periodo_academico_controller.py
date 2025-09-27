@@ -1,3 +1,4 @@
+import logging
 from datetime import date
 from typing import List, Optional
 
@@ -13,6 +14,7 @@ class PeriodoAcademicoController(DatabaseController):
     def __init__(self, db, current_user=None):
         super().__init__(db)
         self.current_user = current_user
+        self.logger = logging.getLogger(f"[{self.__class__.__name__}]")
 
     def crear_periodo(self, data: PeriodoAcademicoCreate) -> PeriodoAcademicoResponse:
         """Crea un nuevo período académico.
@@ -24,10 +26,12 @@ class PeriodoAcademicoController(DatabaseController):
             PeriodoAcademicoResponse: El período académico creado.
         """
         if data.fecha_inicio >= data.fecha_fin:
+            self.logger.warning("La fecha de inicio debe ser menor a la fecha de fin.")
             raise ValueError("La fecha de inicio debe ser menor a la fecha de fin.")
 
         existente = self.session.query(PeriodoAcademico).filter_by(nombre=data.nombre).first()
         if existente:
+            self.logger.error(f"Ya existe un período académico con nombre '{data.nombre}'.")
             raise IntegrityError(None, None, f"Ya existe un período académico con nombre '{data.nombre}'.")
 
         nuevo = PeriodoAcademico(
@@ -37,6 +41,7 @@ class PeriodoAcademicoController(DatabaseController):
         )
         self.session.add(nuevo)
         self._commit_or_rollback()
+        self.logger.info(f"Periodo académico creado: {nuevo}")
         return self._to_response(nuevo, PeriodoAcademicoResponse)
 
     def listar_periodos(self, solo_activos: bool = False) -> List[PeriodoAcademicoResponse]:
@@ -52,6 +57,7 @@ class PeriodoAcademicoController(DatabaseController):
         if solo_activos:
             query = query.filter_by(activo=True)
         periodos = query.order_by(PeriodoAcademico.fecha_inicio.desc()).all()
+        self.logger.info(f"Lista de períodos académicos: {periodos}")
         return self._bulk_to_response(periodos, PeriodoAcademicoResponse)
 
     def activar_periodo(self, periodo_id: int) -> PeriodoAcademicoResponse:
@@ -67,6 +73,7 @@ class PeriodoAcademicoController(DatabaseController):
         periodo = self._get_or_fail(PeriodoAcademico, periodo_id)
         periodo.activo = True
         self._commit_or_rollback()
+        self.logger.info(f"Periodo académico activado: {periodo}")
         return self._to_response(periodo, PeriodoAcademicoResponse)
 
     def desactivar_periodo(self, periodo_id: int) -> PeriodoAcademicoResponse:
@@ -81,6 +88,7 @@ class PeriodoAcademicoController(DatabaseController):
         periodo = self._get_or_fail(PeriodoAcademico, periodo_id)
         periodo.activo = False
         self._commit_or_rollback()
+        self.logger.info(f"Periodo académico desactivado: {periodo}")
         return self._to_response(periodo, PeriodoAcademicoResponse)
 
     def obtener_periodo_por_nombre(self, nombre: str) -> Optional[PeriodoAcademicoResponse]:
@@ -93,6 +101,7 @@ class PeriodoAcademicoController(DatabaseController):
             Optional[PeriodoAcademicoResponse]: El período académico encontrado, si existe.
         """
         periodo = self.session.query(PeriodoAcademico).filter_by(nombre=nombre).first()
+        self.logger.info(f"Periodo académico encontrado: {periodo}")
         return self._to_response(periodo, PeriodoAcademicoResponse) if periodo else None
 
     def get_active_periodo(self) -> Optional[PeriodoAcademicoResponse]:
@@ -102,6 +111,7 @@ class PeriodoAcademicoController(DatabaseController):
             Optional[PeriodoAcademicoResponse]: El período académico activo, si existe.
         """
         activo = self.session.query(PeriodoAcademico).filter_by(activo=True).first()
+        self.logger.info(f"Periodo académico activo: {activo}")
         return self._to_response(activo, PeriodoAcademicoResponse) if activo else None
 
     def delete_periodo(self, periodo_id: int) -> bool:
@@ -115,6 +125,7 @@ class PeriodoAcademicoController(DatabaseController):
         """
         periodo = self._get_or_fail(PeriodoAcademico, periodo_id)
         self.session.delete(periodo)
+        self.logger.info(f"Periodo académico eliminado: {periodo}")
         return self._commit_or_rollback() is True
 
     def update_periodo(self, periodo_id: int, data: PeriodoAcademicoUpdate) -> PeriodoAcademicoResponse:
@@ -142,4 +153,5 @@ class PeriodoAcademicoController(DatabaseController):
             setattr(periodo, field, value)
 
         self._commit_or_rollback()
+        self.logger.info(f"Periodo académico actualizado: {periodo}")
         return self._to_response(periodo, PeriodoAcademicoResponse)

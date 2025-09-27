@@ -1,3 +1,4 @@
+import logging
 from typing import List, Optional
 
 from flask import current_app
@@ -17,6 +18,7 @@ class ProfesorCatedraController(DatabaseController):
     def __init__(self, db, current_user=None):
         super().__init__(db)
         self.current_user = current_user
+        self.logger = logging.getLogger(f"[{self.__class__.__name__}]")
 
     def asignar_catedra(self, data: ProfesorCatedraCreate) -> ProfesorCatedraResponse:
         """Asigna una cátedra a un profesor.
@@ -36,11 +38,13 @@ class ProfesorCatedraController(DatabaseController):
         ).first()
 
         if existente:
+            self.logger.warning(f"Ya existe una asignación para el profesor {data.profesor_id} y cátedra {data.catedra}")
             return self._to_response(existente, ProfesorCatedraResponse)
 
         nueva = ProfesorCatedra(**data.model_dump())
         self.session.add(nueva)
         self._commit_or_rollback()
+        self.logger.info(f"Asignación realizada: {nueva}")
         return self._to_response(nueva, ProfesorCatedraResponse)
 
     def actualizar_asignacion(self, asignacion_id: int, data: ProfesorCatedraUpdate) -> ProfesorCatedraResponse:
@@ -57,6 +61,7 @@ class ProfesorCatedraController(DatabaseController):
         for field, value in data.model_dump(exclude_unset=True).items():
             setattr(asignacion, field, value)
         self._commit_or_rollback()
+        self.logger.info(f"Asignación actualizada: {asignacion}")
         return self._to_response(asignacion, ProfesorCatedraResponse)
 
     def get_catedras_by_profesor(self, profesor_id: int) -> List[ProfesorCatedraResponse]:
@@ -69,6 +74,7 @@ class ProfesorCatedraController(DatabaseController):
             List[ProfesorCatedraResponse]: Lista de asignaciones del profesor.
         """
         registros = self.session.query(ProfesorCatedra).filter_by(profesor_id=profesor_id).all()
+        self.logger.info(f"Asignaciones del profesor {profesor_id}: {registros}")
         return self._bulk_to_response(registros, ProfesorCatedraResponse)
 
     def get_catedra_academica(self, profesor_id: int, catedra: Catedra, periodo_id: int) -> Optional[CatedraAcademicaResponse]:
@@ -87,6 +93,7 @@ class ProfesorCatedraController(DatabaseController):
             catedra=catedra,
             periodo_id=periodo_id
         ).first()
+        self.logger.info(f"Asignación de cátedra a profesor encontrada: {registro}")
 
         return self._to_response(registro, CatedraAcademicaResponse) if registro else None
 
@@ -101,6 +108,7 @@ class ProfesorCatedraController(DatabaseController):
             ProfesorCatedraResponse: La asignación encontrada.
         """
         asignacion = self._get_or_fail(ProfesorCatedra, asignacion_id)
+        self.logger.info(f"Asignación encontrada: {asignacion}")
         return self._to_response(asignacion, ProfesorCatedraResponse)
 
     def eliminar_asignacion(self, profesor_id: int, catedra: Catedra) -> bool:
@@ -122,6 +130,7 @@ class ProfesorCatedraController(DatabaseController):
             return False
 
         self.session.delete(asignacion)
+        self.logger.info(f"Asignación eliminada: {asignacion}")
         return self._commit_or_rollback() is True
 
     def get_students_by_catedra(self, profesor_id: int, catedra: str) -> List:
@@ -136,7 +145,7 @@ class ProfesorCatedraController(DatabaseController):
         """
         periodo = self.session.query(PeriodoAcademico).filter_by(activo=True).first()
         if not periodo:
-            current_app.logger.warning("No hay período académico activo")
+            self.logger.warning("No hay período académico activo")
             return []
 
         registros = self.session.query(CatedraAcademica).filter_by(
@@ -152,6 +161,7 @@ class ProfesorCatedraController(DatabaseController):
                 i.student for i in inscripciones if i.student and i.student.is_student()
             ])
 
+        self.logger.info(f"Estudiantes de la cátedra {catedra} del profesor {profesor_id}: {estudiantes}")
         return estudiantes
 
     def get_all_catedras(self) -> List[ProfesorCatedraResponse]:
@@ -161,4 +171,5 @@ class ProfesorCatedraController(DatabaseController):
             List[ProfesorCatedraResponse]: Lista de todas las asignaciones.
         """
         registros = self.session.query(ProfesorCatedra).all()
+        self.logger.info(f"Todas las asignaciones: {registros}")
         return self._bulk_to_response(registros, ProfesorCatedraResponse)

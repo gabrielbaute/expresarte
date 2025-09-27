@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from typing import List, Optional
 
@@ -15,6 +16,7 @@ class CalificacionController(DatabaseController):
     def __init__(self, db, current_user=None):
         super().__init__(db)
         self.current_user = current_user
+        self.logger = logging.getLogger(f"[{self.__class__.__name__}]")
 
     def registrar_calificacion(self, data: CalificacionCreate) -> CalificacionResponse:
         """Registra la nota final de un alumno en una cátedra específica.
@@ -47,6 +49,7 @@ class CalificacionController(DatabaseController):
 
         self.session.add(nueva)
         self._commit_or_rollback()
+        self.logger.info(f"Calificación registrada: {nueva}")
         return self._to_response(nueva, CalificacionResponse)
 
     def editar_calificacion(self, calificacion_id: int, data: CalificacionUpdate) -> CalificacionResponse:
@@ -67,6 +70,7 @@ class CalificacionController(DatabaseController):
         calificacion.fecha = datetime.utcnow()
 
         self._commit_or_rollback()
+        self.logger.info(f"Calificación actualizada: {calificacion}")
         return self._to_response(calificacion, CalificacionResponse)
 
     def eliminar_calificacion(self, calificacion_id: int) -> bool:
@@ -80,6 +84,7 @@ class CalificacionController(DatabaseController):
         """
         calificacion = self._get_or_fail(Calificacion, calificacion_id)
         self.session.delete(calificacion)
+        self.logger.info(f"Calificación eliminada: {calificacion}")
         return self._commit_or_rollback() is True
 
     def listar_por_estudiante(self, estudiante_id: int) -> List[CalificacionResponse]:
@@ -95,6 +100,8 @@ class CalificacionController(DatabaseController):
             estudiante_id=estudiante_id
         ).order_by(Calificacion.fecha.desc()).all()
 
+        self.logger.info(f"Historial de calificaciones del estudiante {estudiante_id}: {calificaciones}")
+
         return self._bulk_to_response(calificaciones, CalificacionResponse)
 
     def listar_por_catedra(self, catedra_id: int) -> List[CalificacionResponse]:
@@ -109,7 +116,8 @@ class CalificacionController(DatabaseController):
         calificaciones = self.session.query(Calificacion).filter_by(
             catedra_academica_id=catedra_id
         ).order_by(Calificacion.calificacion.desc()).all()
-
+        self.logger.info(f"Calificaciones de la cátedra {catedra_id}: {calificaciones}")
+        
         return self._bulk_to_response(calificaciones, CalificacionResponse)
 
     def obtener_calificacion(self, estudiante_id: int, catedra_id: int) -> Optional[CalificacionResponse]:
@@ -126,5 +134,6 @@ class CalificacionController(DatabaseController):
             estudiante_id=estudiante_id,
             catedra_academica_id=catedra_id
         ).first()
-
+        self.logger.info(f"Calificación de {estudiante_id} en {catedra_id}: {resultado}")
+        
         return self._to_response(resultado, CalificacionResponse) if resultado else None

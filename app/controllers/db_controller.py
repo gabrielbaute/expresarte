@@ -1,8 +1,8 @@
 """Controlador de base de datos"""
+import logging
 from typing import Any, Type
 from pydantic import BaseModel
 from sqlalchemy.ext.declarative import DeclarativeMeta
-from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
 from typing import Union
 
@@ -12,6 +12,7 @@ class DatabaseController:
     def __init__(self, db: SQLAlchemy):
         self.db = db
         self.session = self.db.session
+        self.logger = logging.getLogger(f"[{self.__class__.__name__}]")
 
     def _commit_or_rollback(self) -> Union[bool, str]:
         """Intenta hacer commit de la sesión actual.
@@ -26,7 +27,7 @@ class DatabaseController:
             return True
         except Exception as e:
             self.session.rollback()
-            current_app.logger.error(f"[COMMIT ERROR] {e}")
+            self.logger.error(f"[COMMIT ERROR] {e}")
             return str(e)
 
     def _to_response(self, instance: Any, schema: Type[BaseModel]) -> BaseModel:
@@ -44,6 +45,7 @@ class DatabaseController:
             TypeError: Si el tipo de instancia no es soportado
         """
         if not instance:
+            self.logger.warning("No se encontró el recurso")
             raise NotFoundError("No se encontró el recurso")
         
         if isinstance(instance, dict):
@@ -64,6 +66,7 @@ class DatabaseController:
         Returns:
             list[BaseModel]: Lista de instancias del modelo
         """
+        self.logger.debug(f"Respuesta en bulk: {len(instances)} instancias")
         return [self._to_response(i, schema) for i in instances if i]
 
     def _get_or_fail(self, model_class, object_id: int):
@@ -78,5 +81,6 @@ class DatabaseController:
         """
         obj = self.session.get(model_class, object_id)
         if obj is None:
+            self.logger.warning(f"{model_class.__name__} con ID {object_id} no encontrado")
             raise NotFoundError(f"{model_class.__name__} con ID {object_id} no encontrado.")
         return obj
