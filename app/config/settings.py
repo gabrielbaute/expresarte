@@ -1,6 +1,7 @@
 """Configuración de la aplicación Flask."""
 
 import os
+from typing import Dict
 from dotenv import load_dotenv
 from datetime import timedelta
 
@@ -57,3 +58,11 @@ class Config:
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     MAIL_DEFAULT_SENDER = (os.environ.get('APP_NAME'), os.environ.get('MAIL_USERNAME'))
     MAIL_DEBUG = int(os.environ.get('MAIL_DEBUG', 0))
+
+    def get_initial_admin_data(self) -> Dict[str, str]:
+        return {
+            "primer_nombre": self.ADMIN_NOMBRE,
+            "primer_apellido": self.ADMIN_APELLIDO,
+            "email": self.ADMIN_EMAIL,
+            "password_hash": self.ADMIN_PASSWORD,
+        }

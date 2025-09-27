@@ -6,7 +6,11 @@ from app.database.enums import Role, Sexo
 from app.schemas import UserCreate
 
 def create_initial_super_admin() -> Optional[bool]:
-    """Crea el usuario super_admin al iniciar la aplicación por primera vez."""
+    """Crea el usuario super_admin al iniciar la aplicación por primera vez.
+    
+    Returns:
+        bool: True si se creó el usuario super_admin, False en caso contrario.
+    """
     admin_nombre = Config.ADMIN_NOMBRE
     admin_apellido = Config.ADMIN_APELLIDO or "Admin"
     admin_email = Config.ADMIN_EMAIL
