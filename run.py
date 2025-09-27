@@ -1,7 +1,9 @@
+import logging
 from app.server import create_app
 from app.config import Config
 from waitress import serve
 
+logging.basicConfig(level=logging.INFO)
 app = create_app()
 
 if __name__ == '__main__':
