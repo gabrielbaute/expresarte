@@ -6,3 +6,28 @@
         padding: 0.5em 1em;
     }
 }
+
+body {
+    height: 100%;
+    min-height: 100%;
+    
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+
+}
+
+.sidebar-item {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.sidebar-sub-item {
+    margin-left: 20px;
+}
+
+.menu-list {
+    padding: 5px;
+}

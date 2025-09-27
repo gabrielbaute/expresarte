@@ -19,15 +19,20 @@
 <body>
     <!-- Navbar -->
     {% include 'partials/_navbar.html' %}
+    
+    <!-- Flash messages -->
+    {% include 'partials/_flash_messages.html' %}
 
-    <div class="section">
-        <!-- Flash messages -->
-        {% include 'partials/_flash_messages.html' %}
-      
-        <!-- Content -->
-        {% block content %}
-        {% endblock %}
-    </div>
+    <!-- Sección central -->
+    <section class="main-content columns is-fullheight">
+            {% include 'partials/_sidebar.html' %}
+        
+            <!-- Content -->
+             <div class="container column is-10">
+                {% block content %}
+                {% endblock %}             
+             </div>
+    </section>
     
     <!-- Footer -->
     {% include 'partials/_footer.html' %}
