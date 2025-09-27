@@ -11,6 +11,11 @@ from app.controllers import ControllerFactory
 from app.schemas import UserCreate, PeriodoAcademicoCreate, CatedraAcademicaCreate, ProfesorCatedraCreate, InscripcionCreate, CalificacionCreate
 
 def generar_seed_academico() -> Optional[bool]:
+    """Genera datos de prueba para la base de datos académica.
+    
+    Returns:
+        Optional[bool]: True si la generación fue exitosa, False en caso contrario.
+    """
     try:
         factory = ControllerFactory(current_user=None)
 
@@ -37,6 +42,10 @@ def generar_seed_academico() -> Optional[bool]:
         alumno = user_ctrl.create_user(UserCreate(primer_nombre="Ana", primer_apellido="Ramírez", email="ana@example.com", password_hash=DEFAULT_PASSWORD, role=Role.STUDENT, sexo=Sexo.FEMENINO))
         alumno2 = user_ctrl.create_user(UserCreate(primer_nombre="Pedro", primer_apellido="Pérez", email="pedro@example.com", password_hash=DEFAULT_PASSWORD, role=Role.STUDENT, sexo=Sexo.MASCULINO))
         alumno3 = user_ctrl.create_user(UserCreate(primer_nombre="Juan", primer_apellido="Ilario", email="juan@exanoke.com", password_hash=DEFAULT_PASSWORD, role=Role.STUDENT, sexo=Sexo.MASCULINO))
+        alumno4 = user_ctrl.create_user(UserCreate(primer_nombre="Carlos", primer_apellido="Santana", email="carlos@example.com", password_hash=DEFAULT_PASSWORD, role=Role.STUDENT, sexo=Sexo.MASCULINO))
+        alumno5 = user_ctrl.create_user(UserCreate(primer_nombre="Antonio", primer_apellido="Machado", email="antoniomachado@exanoke.com", password_hash=DEFAULT_PASSWORD, role=Role.STUDENT, sexo=Sexo.MASCULINO))
+        alumno6 = user_ctrl.create_user(UserCreate(primer_nombre="Jesus", primer_apellido="Calvo", email="jesus@exanoke.com", password_hash=DEFAULT_PASSWORD, role=Role.STUDENT, sexo=Sexo.MASCULINO))
+        alumno7 = user_ctrl.create_user(UserCreate(primer_nombre="Catire", primer_apellido="Florentino", email="florentino@exanoke.com", password_hash=DEFAULT_PASSWORD, role=Role.STUDENT, sexo=Sexo.MASCULINO))
 
 
         # 📅 Período Académico
@@ -61,11 +70,19 @@ def generar_seed_academico() -> Optional[bool]:
         insc_ctrl.inscribir_alumno(InscripcionCreate(estudiante_id=alumno.id, catedra_academica_id=guitarra.id, periodo_id=periodo.id, estado=EstadoInscripcion.ACTIVO))
         insc_ctrl.inscribir_alumno(InscripcionCreate(estudiante_id=alumno2.id, catedra_academica_id=guitarra.id, periodo_id=periodo.id, estado=EstadoInscripcion.ACTIVO))
         insc_ctrl.inscribir_alumno(InscripcionCreate(estudiante_id=alumno3.id, catedra_academica_id=guitarra.id, periodo_id=periodo.id, estado=EstadoInscripcion.ACTIVO))
+        insc_ctrl.inscribir_alumno(InscripcionCreate(estudiante_id=alumno4.id, catedra_academica_id=guitarra.id, periodo_id=periodo.id, estado=EstadoInscripcion.ACTIVO))
+        insc_ctrl.inscribir_alumno(InscripcionCreate(estudiante_id=alumno5.id, catedra_academica_id=guitarra.id, periodo_id=periodo.id, estado=EstadoInscripcion.ACTIVO))
+        insc_ctrl.inscribir_alumno(InscripcionCreate(estudiante_id=alumno6.id, catedra_academica_id=guitarra.id, periodo_id=periodo.id, estado=EstadoInscripcion.ACTIVO))
+        insc_ctrl.inscribir_alumno(InscripcionCreate(estudiante_id=alumno7.id, catedra_academica_id=guitarra.id, periodo_id=periodo.id, estado=EstadoInscripcion.ACTIVO))
 
         # 🏁 Calificaciones
         calif_ctrl.registrar_calificacion(CalificacionCreate(estudiante_id=alumno.id, catedra_academica_id=guitarra.id, periodo_id=periodo.id, calificacion=Calificacion.AVANZADO, observaciones="Buen desempeño en clase."))
         calif_ctrl.registrar_calificacion(CalificacionCreate(estudiante_id=alumno2.id, catedra_academica_id=guitarra.id, periodo_id=periodo.id, calificacion=Calificacion.CONSOLIDADO, observaciones="Necesita mejorar en las prácticas."))
         calif_ctrl.registrar_calificacion(CalificacionCreate(estudiante_id=alumno3.id, catedra_academica_id=guitarra.id, periodo_id=periodo.id, calificacion=Calificacion.EN_PROCESO, observaciones="Excelente participación en clase."))
+        calif_ctrl.registrar_calificacion(CalificacionCreate(estudiante_id=alumno4.id, catedra_academica_id=guitarra.id, periodo_id=periodo.id, calificacion=Calificacion.EN_PROCESO, observaciones="Excelente participación en clase."))
+        calif_ctrl.registrar_calificacion(CalificacionCreate(estudiante_id=alumno5.id, catedra_academica_id=guitarra.id, periodo_id=periodo.id, calificacion=Calificacion.EN_PROCESO, observaciones="Excelente participación en clase."))
+        calif_ctrl.registrar_calificacion(CalificacionCreate(estudiante_id=alumno6.id, catedra_academica_id=guitarra.id, periodo_id=periodo.id, calificacion=Calificacion.EN_PROCESO, observaciones="Excelente participación en clase."))
+        calif_ctrl.registrar_calificacion(CalificacionCreate(estudiante_id=alumno7.id, catedra_academica_id=guitarra.id, periodo_id=periodo.id, calificacion=Calificacion.EN_PROCESO, observaciones="Excelente participación en clase."))
 
         return True
 
