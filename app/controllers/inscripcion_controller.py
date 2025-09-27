@@ -12,7 +12,18 @@ class InscripcionController(DatabaseController):
         self.current_user = current_user
 
     def inscribir_alumno(self, data: InscripcionCreate) -> InscripcionResponse:
-        """Inscribe a un alumno en una cátedra si cumple condiciones de rol y cupos"""
+        """Inscribe a un alumno en una cátedra si cumple condiciones de rol y cupos
+        
+        Args:
+            data (InscripcionCreate): Datos de la inscripción.
+        
+        Returns:
+            InscripcionResponse: La inscripción realizada.
+        
+        Raises:
+            NotFoundError: Si la cátedra no existe.
+            PermissionDeniedError: Si no hay cupos disponibles o el alumno ya está inscrito.
+        """
         # Validar existencia de la cátedra
         catedra = self.session.get(CatedraAcademica, data.catedra_academica_id)
         if not catedra:
@@ -47,7 +58,18 @@ class InscripcionController(DatabaseController):
 
 
     def cambiar_estado(self, inscripcion_id: int, nuevo_estado: str) -> InscripcionResponse:
-        """Actualiza el estado de una inscripción"""
+        """Actualiza el estado de una inscripción
+        
+        Args:
+            inscripcion_id (int): ID de la inscripción.
+            nuevo_estado (str): Nuevo estado de la inscripción.
+        
+        Returns:
+            InscripcionResponse: La inscripción actualizada.
+        
+        Raises:
+            ValueError: Si el estado es inválido.
+        """
         insc = self._get_or_fail(Inscripcion, inscripcion_id)
         if nuevo_estado not in ["activo", "retirado", "aprobado"]:
             raise ValueError("Estado inválido")
@@ -56,13 +78,27 @@ class InscripcionController(DatabaseController):
         return self._to_response(insc, InscripcionResponse)
 
     def eliminar_inscripcion(self, inscripcion_id: int) -> bool:
-        """Elimina la inscripción directamente (solo si no hay evaluaciones vinculadas, opcional)"""
+        """Elimina la inscripción directamente (solo si no hay evaluaciones vinculadas, opcional)
+        
+        Args:
+            inscripcion_id (int): ID de la inscripción.
+        
+        Returns:
+            bool: True si la eliminación fue exitosa, False en caso contrario.
+        """
         insc = self._get_or_fail(Inscripcion, inscripcion_id)
         self.session.delete(insc)
         return self._commit_or_rollback() is True
 
     def listar_por_alumno(self, estudiante_id: int) -> List[InscripcionResponse]:
-        """Devuelve todas las inscripciones de un alumno"""
+        """Devuelve todas las inscripciones de un alumno
+        
+        Args:
+            estudiante_id (int): ID del estudiante.
+        
+        Returns:
+            List[InscripcionResponse]: Lista de inscripciones del estudiante.
+        """
         inscripciones = self.session.query(Inscripcion).filter_by(
             estudiante_id=estudiante_id
         ).order_by(Inscripcion.fecha_inscripcion.desc()).all()
@@ -70,11 +106,25 @@ class InscripcionController(DatabaseController):
         return self._bulk_to_response(inscripciones, InscripcionResponse)
 
     def contar_estudiantes_en_catedra(self, catedra_id: int) -> int:
-        """Cuenta el número de inscripciones activas en una cátedra académica"""
+        """Cuenta el número de inscripciones activas en una cátedra académica
+        
+        Args:
+            catedra_id (int): ID de la cátedra.
+        
+        Returns:
+            int: Número de estudiantes inscritos en la cátedra.
+        """
         return self.session.query(Inscripcion).filter_by(catedra_academica_id=catedra_id).count()
 
     def listar_por_catedra(self, catedra_id: int) -> List[InscripcionResponse]:
-        """Devuelve todas las inscripciones activas en una cátedra"""
+        """Devuelve todas las inscripciones activas en una cátedra
+        
+        Args:
+            catedra_id (int): ID de la cátedra.
+        
+        Returns:
+            List[InscripcionResponse]: Lista de inscripciones activas en la cátedra.
+        """
         inscripciones = self.session.query(Inscripcion).filter_by(
             catedra_academica_id=catedra_id
         ).order_by(Inscripcion.fecha_inscripcion.desc()).all()
@@ -82,6 +132,13 @@ class InscripcionController(DatabaseController):
         return self._bulk_to_response(inscripciones, InscripcionResponse)
     
     def obtener_inscripcion(self, inscripcion_id: int) -> InscripcionResponse:
-        """Obtiene una inscripción específica"""
+        """Obtiene una inscripción específica
+        
+        Args:
+            inscripcion_id (int): ID de la inscripción.
+        
+        Returns:
+            InscripcionResponse: La inscripción solicitada.
+        """
         insc = self._get_or_fail(Inscripcion, inscripcion_id)
         return self._to_response(insc, InscripcionResponse)

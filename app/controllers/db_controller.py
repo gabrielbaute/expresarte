@@ -16,6 +16,10 @@ class DatabaseController:
     def _commit_or_rollback(self) -> Union[bool, str]:
         """Intenta hacer commit de la sesión actual.
         Si falla, hace rollback y devuelve el error.
+
+        Returns:
+            bool: True si el commit fue exitoso, False en caso contrario.
+            str: Mensaje de error en caso de falla.
         """
         try:
             self.session.commit()
@@ -28,6 +32,16 @@ class DatabaseController:
     def _to_response(self, instance: Any, schema: Type[BaseModel]) -> BaseModel:
         """
         Convierte instancia de ORM o dict en un schema de respuesta.
+
+        Args:
+            instance (Any): Instancia del ORM que se consulta
+            schema (BaseModel): Modelo Pydantic
+        
+        Returns:
+            BaseModel: Instancia del modelo Pydantic correspondiente a la instancia del ORM
+        
+        Raises:
+            TypeError: Si el tipo de instancia no es soportado
         """
         if not instance:
             raise NotFoundError("No se encontró el recurso")
@@ -41,11 +55,27 @@ class DatabaseController:
         raise TypeError(f"Tipo no soportado: {type(instance)}")
 
     def _bulk_to_response(self, instances: list[Any], schema: Type[BaseModel]) -> list[BaseModel]:
-        """Convierte múltiples instancias ORM o dicts en schemas Pydantic"""
+        """Convierte múltiples instancias ORM o dicts en schemas Pydantic
+        
+        Args:
+            instances (list[Any]): Lista de instancias del ORM o dicts
+            schema (Type[BaseModel]): Modelo Pydantic correspondiente
+        
+        Returns:
+            list[BaseModel]: Lista de instancias del modelo
+        """
         return [self._to_response(i, schema) for i in instances if i]
 
     def _get_or_fail(self, model_class, object_id: int):
-        """Obtiene un objeto por su ID o lanza NotFoundError si no existe."""
+        """Obtiene un objeto por su ID o lanza NotFoundError si no existe.
+        
+        Args:
+            model_class: Modelo del ORM
+            object_id (int): ID del objeto
+        
+        Raises:
+            NotFoundError: Si el objeto no existe
+        """
         obj = self.session.get(model_class, object_id)
         if obj is None:
             raise NotFoundError(f"{model_class.__name__} con ID {object_id} no encontrado.")

@@ -15,13 +15,16 @@ class UserController(DatabaseController):
 
     # Validaciones internas
     def _validate_role(self, role: Union[str, Role]) -> str:
-        """Validates the user role.
+        """Valida el rol de un usuario y si ese rol existe.
         
-        Keyword arguments:
-        argument: role -- Role to validate, can be a string or Role enum
-        Return: str -- Validated role as a string
+        Args:
+            role (Union[str, Role]): Rol del usuario.
+        
+        Returns:
+            str: Rol del usuario.
+        
         Raises:
-        InvalidRoleError -- If the role is not valid
+            InvalidRoleError: Si el rol no es válido.
         """
         role_str = role.value if isinstance(role, Role) else role
         if role_str not in Role.to_list():
@@ -29,12 +32,13 @@ class UserController(DatabaseController):
         return role_str
 
     def _check_permission(self, permission: Permission) -> None:
-        """Checks if the current user has the required permission.
+        """Verifica si un usuario tiene permiso para realizar una acción.
         
-        Keyword arguments:
-        argument: permission -- Permission to check
+        Args:
+            permission (Permission): Permiso a verificar.
+        
         Raises:
-        PermissionDeniedError -- If the user does not have the required permission
+            PermissionDeniedError: Si el usuario no tiene el permiso requerido.
         """
         if self.current_user is None:
             if permission == Permission.VIEW_USERS:
@@ -48,13 +52,16 @@ class UserController(DatabaseController):
 
     # Métodos CRUD para usuarios
     def create_user(self, data: UserCreate) -> UserResponse:
-        """"
-        Creates a new user in the database.
-        Keyword arguments:
-        argument: data -- UserCreate schema with user details
-        Return: UserResponse -- UserResponse schema with the created user details
+        """Crea un usuario nuevo
+        
+        Args:
+            data (UserCreate): Datos del usuario.
+        
+        Returns:
+            UserResponse: El usuario creado.
+        
         Raises:
-        PermissionDeniedError -- If there is already a user with the same email
+            PermissionDeniedError: Si ya existe un usuario con el mismo correo.
         """
         if self.session.query(Usuario).filter_by(email=data.email).first():
             raise PermissionDeniedError("Ya existe un usuario con ese correo.")
@@ -79,7 +86,15 @@ class UserController(DatabaseController):
         return self._to_response(user, UserResponse)
 
     def edit_user(self, user_id: int, data: UserUpdate) -> UserResponse:
-        """Edita los detalles de un usuario por su ID."""
+        """Edita los detalles de un usuario por su ID.
+        
+        Args:
+            user_id (int): ID del usuario.
+            data (UserUpdate): Datos actualizados del usuario.
+        
+        Returns:
+            UserResponse: El usuario actualizado.
+        """
         user = self._get_or_fail(Usuario, user_id)
         for field, value in data.model_dump(exclude_unset=True).items():
             setattr(user, field, value)
@@ -88,7 +103,14 @@ class UserController(DatabaseController):
         return self._to_response(user, UserResponse)
 
     def list_users(self, role: Optional[str] = None) -> List[UserResponse]:
-        """Lista todos los usuarios."""
+        """Lista todos los usuarios.
+        
+        Args:
+            role (Optional[str]): Filtra por rol si se proporciona.
+        
+        Returns:
+            List[UserResponse]: Lista de usuarios.
+        """
         self._check_permission(Permission.VIEW_USERS)
         query = self.session.query(Usuario)
         if role:
@@ -96,7 +118,14 @@ class UserController(DatabaseController):
         return self._bulk_to_response(query.all(), UserResponse)
 
     def disable_user(self, user_id: int) -> UserResponse:
-        """Desactiva un usuario por su ID."""
+        """Desactiva un usuario por su ID.
+        
+        Args:
+            user_id (int): ID del usuario.
+        
+        Returns:
+            UserResponse: El usuario desactivado.
+        """
         user = self._get_or_fail(Usuario, user_id)
         user.activo = False
         self._commit_or_rollback()
@@ -104,7 +133,15 @@ class UserController(DatabaseController):
 
     # Métodos misceláneos
     def count_users_by_role(self, role: str, only_active: bool = True) -> int:
-        """Cuenta el número de usuarios por rol."""
+        """Cuenta el número de usuarios por rol.
+        
+        Args:
+            role (str): Rol del usuario.
+            only_active (bool): Si True, solo cuenta los usuarios activos.
+        
+        Returns:
+            int: Número de usuarios.
+        """
         self._check_permission(Permission.VIEW_USERS)
         self._validate_role(role)
 
@@ -115,19 +152,41 @@ class UserController(DatabaseController):
         return query.count()
 
     def get_user_by_email(self, email: str) -> UserResponse:
-        """Obtiene un usuario por su correo electrónico."""
+        """Obtiene un usuario por su correo electrónico.
+        
+        Args:
+            email (str): Correo electrónico del usuario.
+        
+        Returns:
+            UserResponse: El usuario encontrado.
+        """
         self._check_permission(Permission.VIEW_USERS)
         user = self.session.query(Usuario).filter_by(email=email).first()
         return self._to_response(user, UserResponse)
 
     def get_user_by_id(self, user_id: int) -> UserResponse:
-        """Obtiene un usuario por su ID."""
+        """Obtiene un usuario por su ID.
+        
+        Args:
+            user_id (int): ID del usuario.
+        
+        Returns:
+            UserResponse: El usuario encontrado.
+        """
         self._check_permission(Permission.VIEW_USERS)
         user = self.session.get(Usuario, user_id)
         return self._to_response(user, UserResponse)
 
     def get_users_by_role(self, role: Union[str, Role], only_active: bool = True) -> List[UserResponse]:
-        """Obtiene todos los usuarios por rol."""
+        """Obtiene todos los usuarios por rol.
+        
+        Args:
+            role (Union[str, Role]): Rol del usuario.
+            only_active (bool): Si True, solo devuelve los usuarios activos.
+        
+        Returns:
+            List[UserResponse]: Lista de usuarios.
+        """
         self._check_permission(Permission.VIEW_USERS)
 
         query = self.session.query(Usuario)
@@ -147,23 +206,59 @@ class UserController(DatabaseController):
         return self._bulk_to_response(query.all(), UserResponse)
 
     def get_all_teachers(self, only_active: bool = True) -> List[UserResponse]:
-        """Obtiene todos los profesores."""
+        """Obtiene todos los profesores.
+        
+        Args:
+            only_active (bool): Si True, solo devuelve los profesores activos.
+        
+        Returns:
+            List[UserResponse]: Lista de profesores.
+        """
         return self.get_users_by_role(Role.TEACHER.value, only_active)
 
     def get_all_students(self, only_active: bool = True) -> List[UserResponse]:
-        """Obtiene todos los estudiantes."""
+        """Obtiene todos los estudiantes.
+        
+        Args:
+            only_active (bool): Si True, solo devuelve los estudiantes activos.
+        
+        Returns:
+            List[UserResponse]: Lista de estudiantes.
+        """
         return self.get_users_by_role(Role.STUDENT.value, only_active)
 
     def get_all_admins(self, only_active: bool = True) -> List[UserResponse]:
-        """Obtiene todos los administradores."""
+        """Obtiene todos los administradores.
+        
+        Args:
+            only_active (bool): Si True, solo devuelve los administradores activos.
+        
+        Returns:
+            List[UserResponse]: Lista de administradores.
+        """
         return self.get_users_by_role(Role.ADMIN.value, only_active)
 
     def get_user_model_by_email(self, email: str) -> Optional[Usuario]:
-        """Obtiene un modelo de usuario por su correo electrónico."""
+        """Obtiene un modelo de usuario por su correo electrónico.
+        
+        Args:
+            email (str): Correo electrónico del usuario.
+        
+        Returns:
+            Optional[Usuario]: El modelo de usuario encontrado, si existe.
+        """
         return self.session.query(Usuario).filter_by(email=email).first()
 
     def update_user_password(self, user_id: int, new_password: str) -> bool:
-        """Actualiza la contraseña de un usuario."""
+        """Actualiza la contraseña de un usuario.
+        
+        Args:
+            user_id (int): ID del usuario.
+            new_password (str): Nueva contraseña.
+        
+        Returns:
+            bool: True si la actualización fue exitosa, False en caso contrario.
+        """
         user = self._get_or_fail(Usuario, user_id)
         user.password_hash = generate_password_hash(new_password)
         self._commit_or_rollback()

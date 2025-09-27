@@ -17,7 +17,17 @@ class CalificacionController(DatabaseController):
         self.current_user = current_user
 
     def registrar_calificacion(self, data: CalificacionCreate) -> CalificacionResponse:
-        """Registra la nota final de un alumno en una cátedra específica"""
+        """Registra la nota final de un alumno en una cátedra específica.
+
+        Args:
+            data (CalificacionCreate): Datos de la calificación.
+
+        Returns:
+            CalificacionResponse: La calificación registrada.
+
+        Raises:
+            PermissionDeniedError: Si ya existe una calificación registrada para la cátedra.
+        """
         existente = self.session.query(Calificacion).filter_by(
             estudiante_id=data.estudiante_id,
             catedra_academica_id=data.catedra_academica_id
@@ -40,7 +50,15 @@ class CalificacionController(DatabaseController):
         return self._to_response(nueva, CalificacionResponse)
 
     def editar_calificacion(self, calificacion_id: int, data: CalificacionUpdate) -> CalificacionResponse:
-        """Edita una calificación existente"""
+        """Edita una calificación existente.
+
+        Args:
+            calificacion_id (int): ID de la calificación a editar.
+            data (CalificacionUpdate): Datos actualizados de la calificación.
+
+        Returns:
+            CalificacionResponse: La calificación actualizada.
+        """
         calificacion = self._get_or_fail(Calificacion, calificacion_id)
 
         for field, value in data.model_dump(exclude_unset=True).items():
@@ -52,13 +70,27 @@ class CalificacionController(DatabaseController):
         return self._to_response(calificacion, CalificacionResponse)
 
     def eliminar_calificacion(self, calificacion_id: int) -> bool:
-        """Elimina una calificación"""
+        """Elimina una calificación.
+
+        Args:
+            calificacion_id (int): ID de la calificación a eliminar.
+
+        Returns:
+            bool: True si la eliminación fue exitosa, False en caso contrario.
+        """
         calificacion = self._get_or_fail(Calificacion, calificacion_id)
         self.session.delete(calificacion)
         return self._commit_or_rollback() is True
 
     def listar_por_estudiante(self, estudiante_id: int) -> List[CalificacionResponse]:
-        """Devuelve el historial de calificaciones de un estudiante"""
+        """Devuelve el historial de calificaciones de un estudiante
+        
+        Args:
+            estudiante_id (int): ID del estudiante.
+        
+        Returns:
+            List[CalificacionResponse]: Lista de calificaciones del estudiante.
+        """
         calificaciones = self.session.query(Calificacion).filter_by(
             estudiante_id=estudiante_id
         ).order_by(Calificacion.fecha.desc()).all()
@@ -66,7 +98,14 @@ class CalificacionController(DatabaseController):
         return self._bulk_to_response(calificaciones, CalificacionResponse)
 
     def listar_por_catedra(self, catedra_id: int) -> List[CalificacionResponse]:
-        """Devuelve todas las calificaciones asociadas a una cátedra"""
+        """Devuelve todas las calificaciones asociadas a una cátedra
+        
+        Args:
+            catedra_id (int): ID de la cátedra.
+        
+        Returns:
+            List[CalificacionResponse]: Lista de calificaciones de la cátedra.
+        """
         calificaciones = self.session.query(Calificacion).filter_by(
             catedra_academica_id=catedra_id
         ).order_by(Calificacion.calificacion.desc()).all()
@@ -74,7 +113,15 @@ class CalificacionController(DatabaseController):
         return self._bulk_to_response(calificaciones, CalificacionResponse)
 
     def obtener_calificacion(self, estudiante_id: int, catedra_id: int) -> Optional[CalificacionResponse]:
-        """Obtiene la calificación específica de un alumno en una cátedra"""
+        """Obtiene la calificación específica de un alumno en una cátedra
+        
+        Args:
+            estudiante_id (int): ID del estudiante.
+            catedra_id (int): ID de la cátedra.
+        
+        Returns:
+            Optional[CalificacionResponse]: La calificación del estudiante en la cátedra, si existe.
+        """
         resultado = self.session.query(Calificacion).filter_by(
             estudiante_id=estudiante_id,
             catedra_academica_id=catedra_id

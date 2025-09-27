@@ -17,7 +17,17 @@ class CatedraAcademicaController(DatabaseController):
         self.current_user = current_user
 
     def crear_catedra(self, data: CatedraAcademicaCreate) -> CatedraAcademicaResponse:
-        """Crea una nueva cátedra académica."""
+        """Crea una nueva cátedra académica.
+        
+        Args:
+            data (CatedraAcademicaCreate): Datos de la cátedra a crear.
+        
+        Returns:
+            CatedraAcademicaResponse: La cátedra académica creada.
+        
+        Raises:
+            PermissionDeniedError: Si ya existe una cátedra académica con los mismos datos.
+        """
         existente = self.session.query(CatedraAcademica).filter_by(
             catedra=data.catedra,
             periodo_id=data.periodo_id,
@@ -35,7 +45,18 @@ class CatedraAcademicaController(DatabaseController):
         return self._to_response(nueva, CatedraAcademicaResponse)
 
     def asignar_profesor(self, catedra_id: int, profesor_id: int) -> CatedraAcademicaResponse:
-        """Asigna un profesor a una cátedra académica."""
+        """Asigna un profesor a una cátedra académica.
+
+        Args:
+            catedra_id (int): ID de la cátedra.
+            profesor_id (int): ID del profesor.
+
+        Returns:
+            CatedraAcademicaResponse: La cátedra académica con el profesor asignado.
+
+        Raises:
+            NotFoundError: Si la cátedra no existe.
+        """
         catedra = self._get_or_fail(CatedraAcademica, catedra_id)
         catedra.profesor_id = profesor_id
         self._commit_or_rollback()
@@ -49,25 +70,54 @@ class CatedraAcademicaController(DatabaseController):
         return self._bulk_to_response(catedras, CatedraAcademicaResponse)
 
     def listar_por_profesor(self, profesor_id: int) -> List[CatedraAcademicaResponse]:
-        """Lista todas las cátedras académicas asignadas a un profesor específico."""
+        """Lista todas las cátedras académicas asignadas a un profesor específico.
+        
+        Args:
+            profesor_id (int): ID del profesor.
+        
+        Returns:
+            List[CatedraAcademicaResponse]: Lista de cátedras académicas del profesor.
+        """
         catedras = self.session.query(CatedraAcademica).filter_by(profesor_id=profesor_id).order_by(
             CatedraAcademica.periodo_id.desc()
         ).all()
         return self._bulk_to_response(catedras, CatedraAcademicaResponse)
 
     def eliminar_catedra(self, catedra_id: int) -> bool:
-        """Elimina una cátedra académica por su ID."""
+        """Elimina una cátedra académica por su ID.
+        
+        Args:
+            catedra_id (int): ID de la cátedra a eliminar.
+        
+        Returns:
+            bool: True si la eliminación fue exitosa, False en caso contrario.
+        """
         catedra = self._get_or_fail(CatedraAcademica, catedra_id)
         self.session.delete(catedra)
         return self._commit_or_rollback() is True
 
     def obtener_por_id(self, catedra_id: int) -> CatedraAcademicaResponse:
-        """Obtiene una cátedra académica por su ID."""
+        """Obtiene una cátedra académica por su ID.
+        
+        Args:
+            catedra_id (int): ID de la cátedra.
+        
+        Returns:
+            CatedraAcademicaResponse: La cátedra académica encontrada.
+        """
         catedra = self._get_or_fail(CatedraAcademica, catedra_id)
         return self._to_response(catedra, CatedraAcademicaResponse)
 
     def actualizar_catedra(self, catedra_id: int, data: CatedraAcademicaUpdate) -> CatedraAcademicaResponse:
-        """Actualiza los detalles de una cátedra académica."""
+        """Actualiza los detalles de una cátedra académica.
+        
+        Args:
+            catedra_id (int): ID de la cátedra a actualizar.
+            data (CatedraAcademicaUpdate): Datos actualizados de la cátedra.
+        
+        Returns:
+            CatedraAcademicaResponse: La cátedra académica actualizada.
+        """
         catedra = self._get_or_fail(CatedraAcademica, catedra_id)
         for field, value in data.model_dump(exclude_unset=True).items():
             setattr(catedra, field, value)
